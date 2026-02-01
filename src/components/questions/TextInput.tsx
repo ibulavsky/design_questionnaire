@@ -1,0 +1,37 @@
+'use client';
+
+import React from 'react';
+
+interface TextInputProps {
+    value: string;
+    onChange: (value: string) => void;
+    placeholder?: string;
+    isTextArea?: boolean;
+}
+
+const TextInput: React.FC<TextInputProps> = ({ value, onChange, placeholder, isTextArea }) => {
+    const commonClasses = "w-full p-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all";
+
+    if (isTextArea) {
+        return (
+            <textarea
+                className={`${commonClasses} min-h-[150px] resize-none`}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                placeholder={placeholder}
+            />
+        );
+    }
+
+    return (
+        <input
+            type="text"
+            className={commonClasses}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={placeholder}
+        />
+    );
+};
+
+export default TextInput;
