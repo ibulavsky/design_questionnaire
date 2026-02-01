@@ -1,16 +1,23 @@
-'use client';
-
+import path from 'path';
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Font, Image as PDFImage } from '@react-pdf/renderer';
 import { QUESTIONS } from '../data/questions';
 import { Answers } from './types';
 
-// Register Roboto font which has excellent Cyrillic support and stable TTF links
+// Helper to get absolute path to fonts for server-side rendering
+const getFontPath = (fontFile: string) => {
+    if (typeof window === 'undefined') {
+        return path.join(process.cwd(), 'public', 'fonts', fontFile);
+    }
+    return `/fonts/${fontFile}`;
+};
+
+// Register font for Cyrillic support
 Font.register({
     family: 'Onest',
     fonts: [
-        { src: '/fonts/Onest-Regular.ttf' },
-        { src: '/fonts/Onest-Bold.ttf', fontWeight: 'bold' },
+        { src: getFontPath('Onest-Regular.ttf') },
+        { src: getFontPath('Onest-Bold.ttf'), fontWeight: 'bold' },
     ],
 });
 
@@ -74,16 +81,41 @@ export const QuestionnairePDF: React.FC<PDFTemplateProps> = ({ answers }) => (
     <Document>
         <Page size="A4" style={styles.page}>
             <View style={styles.header}>
-                <Text style={styles.title}>Design Brief Result</Text>
-                <Text style={styles.subtitle}>Generated on {new Date().toLocaleDateString()}</Text>
+                <Text style={styles.title}>Результаты брифа на дизайн</Text>
+                <Text style={styles.subtitle}>Сгенерировано {new Date().toLocaleDateString()}</Text>
             </View>
 
             {QUESTIONS.map((q) => {
                 const answer = answers[q.id];
                 if (!answer) return null;
 
+                // Handle file uploads (images)
+                if (q.type === 'file' && Array.isArray(answer)) {
+                    return (
+                        <View key={q.id} style={styles.section} wrap={false}>
+                            <Text style={styles.question}>{q.title}</Text>
+                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                                {answer.map((item, idx) => {
+                                    const imgSrc = typeof item === 'string' ? item : (item as any).data;
+                                    if (!imgSrc) return null;
+
+                                    return (
+                                        <View key={idx} style={{ width: '30%', marginBottom: 10 }}>
+                                            <PDFImage src={imgSrc} style={{ width: '100%' }} />
+                                            <Text style={{ fontSize: 8, color: '#666', marginTop: 2 }}>
+                                                {(item as any).name || `Изображение ${idx + 1}`}
+                                            </Text>
+                                        </View>
+                                    );
+                                })}
+                            </View>
+                        </View>
+                    );
+                }
+
+                // Handle regular answers
                 return (
-                    <View key={q.id} style={styles.section}>
+                    <View key={q.id} style={styles.section} wrap={false}>
                         <Text style={styles.question}>{q.title}</Text>
                         <Text style={styles.answer}>
                             {Array.isArray(answer) ? answer.join(', ') : answer}
@@ -93,7 +125,7 @@ export const QuestionnairePDF: React.FC<PDFTemplateProps> = ({ answers }) => (
             })}
 
             <Text style={styles.footer}>
-                © {new Date().getFullYear()} Design Studio. All rights reserved.
+                © {new Date().getFullYear()} Design Studio. Все права защищены.
             </Text>
         </Page>
     </Document>

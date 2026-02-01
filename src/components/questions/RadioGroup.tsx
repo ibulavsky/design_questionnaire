@@ -1,45 +1,77 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { QuestionOption } from '../../lib/types';
+import RadioItem from './RadioItem';
 
 interface RadioGroupProps {
-    options: string[];
+    options: (string | QuestionOption)[];
     value: string;
     onChange: (value: string) => void;
     name?: string;
+    allowOther?: boolean;
 }
 
-const RadioGroup: React.FC<RadioGroupProps> = ({ options, value, onChange, name = 'radio-group' }) => {
-    return (
-        <div className="flex flex-col gap-3" role="radiogroup">
-            {options.map((option) => {
-                const isSelected = value === option;
+const RadioGroup: React.FC<RadioGroupProps> = ({ options, value, onChange, name = 'radio-group', allowOther = false }) => {
+    const normalizeOption = (opt: string | QuestionOption): QuestionOption => {
+        return typeof opt === 'string' ? { label: opt } : opt;
+    };
 
-                return (
-                    <label
-                        key={option}
-                        className={`w-full p-4 rounded-xl border transition-all cursor-pointer flex items-center gap-4 ${isSelected
-                                ? "bg-blue-600 border-blue-400 text-white shadow-lg shadow-blue-900/40"
-                                : "bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:border-white/20"
-                            }`}
-                    >
-                        <input
-                            type="radio"
-                            name={name}
+    const isCustomValue = (val: string) => {
+        if (!val) return false;
+        return !options.some(opt => normalizeOption(opt).label === val);
+    };
+
+    const [isOtherActive, setIsOtherActive] = useState(isCustomValue(value));
+
+    useEffect(() => {
+        if (isCustomValue(value)) {
+            setIsOtherActive(true);
+        }
+    }, [value]);
+
+    const handleOptionSelect = (label: string) => {
+        setIsOtherActive(false);
+        onChange(label);
+    };
+
+    const handleOtherSelect = () => {
+        setIsOtherActive(true);
+        if (!isCustomValue(value)) {
+            onChange('');
+        }
+    };
+
+    return (
+        <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4" role="radiogroup">
+                {options.map((opt) => {
+                    const option = normalizeOption(opt);
+                    const isSelected = !isOtherActive && value === option.label;
+
+                    return (
+                        <RadioItem
+                            key={option.label}
+                            label={option.label}
+                            description={option.description}
+                            image={option.image}
                             checked={isSelected}
-                            onChange={() => onChange(option)}
-                            className="sr-only"
+                            onSelect={() => handleOptionSelect(option.label)}
+                            name={name}
                         />
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${isSelected
-                                ? "bg-white border-white"
-                                : "bg-transparent border-white/40"
-                            }`}>
-                            {isSelected && <div className="w-2 h-2 rounded-full bg-blue-600" />}
-                        </div>
-                        <span>{option}</span>
-                    </label>
-                );
-            })}
+                    );
+                })}
+                {allowOther && (
+                    <RadioItem
+                        label={isCustomValue(value) ? value : "Свой вариант"}
+                        checked={isOtherActive}
+                        isEditable={true}
+                        onSelect={handleOtherSelect}
+                        onLabelChange={(val) => onChange(val)}
+                        name={name}
+                    />
+                )}
+            </div>
         </div>
     );
 };

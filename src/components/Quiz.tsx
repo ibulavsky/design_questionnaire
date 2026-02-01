@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { QUESTIONS } from '../data/questions';
-import { Answers } from '../lib/types';
+import { Answers, Question } from '../lib/types';
 import {
     saveAnswers, loadAnswers,
     saveCurrentStep, loadCurrentStep,
@@ -13,22 +13,32 @@ import Slide from './Slide';
 import TextInput from './questions/TextInput';
 import RadioGroup from './questions/RadioGroup';
 import CheckboxGroup from './questions/CheckboxGroup';
+import FileUpload from './questions/FileUpload';
+import FieldGroup from './FieldGroup';
 import ResetButton from './ResetButton';
 import DownloadPDF from './DownloadPDF';
+import Modal from './ui/Modal';
 import { ChevronLeft, ChevronRight, Send, CheckCircle2 } from 'lucide-react';
 
 const Quiz = () => {
-    const [currentStep, setCurrentStep] = useState<number>(-1); // -1 is loading
+    const [currentStep, setCurrentStep] = useState<number>(-1);
     const [direction, setDirection] = useState(0);
     const [answers, setAnswers] = useState<Answers>({});
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submittedAnswers, setSubmittedAnswers] = useState<Answers | null>(null);
+    const [isResetModalOpen, setIsResetModalOpen] = useState(false);
 
-    // Initialize from storage
     useEffect(() => {
         const savedAnswers = loadAnswers();
-        const savedStep = loadCurrentStep();
+        let savedStep = loadCurrentStep();
+
+        // Safety check: if saved step is out of bounds (due to question list changes), reset to 0
+        if (savedStep >= QUESTIONS.length || savedStep < 0) {
+            savedStep = 0;
+            saveCurrentStep(0);
+        }
+
         setAnswers(savedAnswers);
         setCurrentStep(savedStep);
     }, []);
@@ -51,19 +61,38 @@ const Quiz = () => {
         }
     };
 
-    const updateAnswer = (questionId: string, value: string | string[]) => {
+    const updateAnswer = (questionId: string, value: string | string[] | (File | string)[]) => {
         const newAnswers = { ...answers, [questionId]: value };
         setAnswers(newAnswers);
-        saveAnswers(newAnswers);
+        // Don't save File objects to localStorage
+        const storableAnswers = { ...newAnswers };
+        Object.keys(storableAnswers).forEach(key => {
+            if (Array.isArray(storableAnswers[key]) && storableAnswers[key][0] instanceof File) {
+                delete storableAnswers[key];
+            }
+        });
+        saveAnswers(storableAnswers);
     };
 
     const handleFullReset = () => {
-        if (confirm('Вы уверены, что хотите сбросить все ответы?')) {
-            clearAnswers();
-            setAnswers({});
-            setCurrentStep(0);
-            saveCurrentStep(0);
-        }
+        setIsResetModalOpen(true);
+    };
+
+    const confirmFullReset = () => {
+        clearAnswers();
+        setAnswers({});
+        setCurrentStep(0);
+        saveCurrentStep(0);
+        setIsResetModalOpen(false);
+    };
+
+    const handleGroupReset = (fields: Question[]) => {
+        const newAnswers = { ...answers };
+        fields.forEach(field => {
+            clearAnswer(field.id);
+            delete newAnswers[field.id];
+        });
+        setAnswers(newAnswers);
     };
 
     const handleSingleReset = (questionId: string) => {
@@ -76,27 +105,55 @@ const Quiz = () => {
     const handleSubmit = async () => {
         setIsSubmitting(true);
         try {
+            const formData = new FormData();
+
+            // Separate data: questions with simple values and questions with files
+            Object.keys(answers).forEach(key => {
+                const value = answers[key];
+                if (Array.isArray(value) && value[0] instanceof File) {
+                    value.forEach(file => {
+                        formData.append(`file_${key}`, file);
+                    });
+                } else {
+                    formData.append(key, JSON.stringify(value));
+                }
+            });
+
             const response = await fetch('/api/submit', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(answers),
+                body: formData,
             });
 
             if (response.ok) {
-                setSubmittedAnswers({ ...answers }); // Save for the PDF link on success screen
+                setSubmittedAnswers({ ...answers });
                 setIsSubmitted(true);
                 clearAnswers();
             } else {
                 alert('Ошибка при отправке. Попробуйте снова.');
             }
         } catch (error) {
+            console.error('Submission error:', error);
             alert('Ошибка при отправке. Проверьте соединение.');
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    if (currentStep === -1) return null; // Loading state
+    const isGroupAnswered = (question: Question | undefined): boolean => {
+        if (!question) return false;
+        if (question.type === 'group' && question.fields) {
+            return question.fields.every(field => {
+                if (!field.required) return true;
+                const answer = answers[field.id];
+                return Array.isArray(answer) ? answer.length > 0 : !!answer;
+            });
+        }
+        if (!question.required) return true;
+        const answer = answers[question.id];
+        return Array.isArray(answer) ? answer.length > 0 : !!answer;
+    };
+
+    if (currentStep === -1) return null;
 
     if (isSubmitted && submittedAnswers) {
         return (
@@ -108,9 +165,7 @@ const Quiz = () => {
                 <p className="text-white/60 max-w-md mx-auto mb-2">
                     Ваш бриф успешно отправлен в Telegram и на Email.
                 </p>
-
                 <DownloadPDF answers={submittedAnswers} />
-
                 <div className="mt-12">
                     <button
                         onClick={() => window.location.reload()}
@@ -124,12 +179,82 @@ const Quiz = () => {
     }
 
     const currentQuestion = QUESTIONS[currentStep];
-    const currentAnswer = answers[currentQuestion.id] || (currentQuestion.type === 'checkbox' ? [] : '');
+
+    // Final defensive check
+    if (!currentQuestion) {
+        return (
+            <div className="text-center py-20">
+                <p className="text-white mb-4">Произошла ошибка загрузки вопроса.</p>
+                <ResetButton type="full" onReset={handleFullReset} />
+            </div>
+        );
+    }
 
     const isLastStep = currentStep === QUESTIONS.length - 1;
-    const isAnswered = currentQuestion.required
-        ? (Array.isArray(currentAnswer) ? currentAnswer.length > 0 : !!currentAnswer)
-        : true;
+    const isAnswered = isGroupAnswered(currentQuestion);
+
+    const renderQuestionContent = () => {
+        if (currentQuestion.type === 'group' && currentQuestion.fields) {
+            return (
+                <FieldGroup
+                    fields={currentQuestion.fields}
+                    answers={answers}
+                    onUpdate={updateAnswer}
+                />
+            );
+        }
+
+        const currentAnswer = answers[currentQuestion.id] ||
+            (currentQuestion.type === 'checkbox' ? [] :
+                currentQuestion.type === 'file' ? [] : '');
+
+        switch (currentQuestion.type) {
+            case 'text':
+                return (
+                    <TextInput
+                        value={currentAnswer as string}
+                        onChange={(val) => updateAnswer(currentQuestion.id, val)}
+                        placeholder={currentQuestion.placeholder}
+                    />
+                );
+            case 'textarea':
+                return (
+                    <TextInput
+                        value={currentAnswer as string}
+                        onChange={(val) => updateAnswer(currentQuestion.id, val)}
+                        placeholder={currentQuestion.placeholder}
+                        isTextArea
+                    />
+                );
+            case 'radio':
+                return (
+                    <RadioGroup
+                        options={currentQuestion.options || []}
+                        value={currentAnswer as string}
+                        onChange={(val) => updateAnswer(currentQuestion.id, val)}
+                        allowOther={currentQuestion.allowOther}
+                    />
+                );
+            case 'checkbox':
+                return (
+                    <CheckboxGroup
+                        options={currentQuestion.options || []}
+                        value={currentAnswer as string[]}
+                        onChange={(val) => updateAnswer(currentQuestion.id, val)}
+                        allowOther={currentQuestion.allowOther}
+                    />
+                );
+            case 'file':
+                return (
+                    <FileUpload
+                        value={currentAnswer as (File | string)[]}
+                        onChange={(val) => updateAnswer(currentQuestion.id, val)}
+                    />
+                );
+            default:
+                return null;
+        }
+    };
 
     return (
         <div className="w-full">
@@ -151,48 +276,26 @@ const Quiz = () => {
                                 <p className="text-white/60 mb-6">{currentQuestion.description}</p>
                             )}
                         </div>
-                        <ResetButton type="single" onReset={() => handleSingleReset(currentQuestion.id)} />
+                        <ResetButton
+                            type="single"
+                            onReset={() => currentQuestion.type === 'group' && currentQuestion.fields
+                                ? handleGroupReset(currentQuestion.fields)
+                                : handleSingleReset(currentQuestion.id)
+                            }
+                        />
                     </div>
 
                     <div className="min-h-[250px]">
-                        {currentQuestion.type === 'text' && (
-                            <TextInput
-                                value={currentAnswer as string}
-                                onChange={(val) => updateAnswer(currentQuestion.id, val)}
-                                placeholder={currentQuestion.placeholder}
-                            />
-                        )}
-                        {currentQuestion.type === 'textarea' && (
-                            <TextInput
-                                value={currentAnswer as string}
-                                onChange={(val) => updateAnswer(currentQuestion.id, val)}
-                                placeholder={currentQuestion.placeholder}
-                                isTextArea
-                            />
-                        )}
-                        {currentQuestion.type === 'radio' && (
-                            <RadioGroup
-                                options={currentQuestion.options || []}
-                                value={currentAnswer as string}
-                                onChange={(val) => updateAnswer(currentQuestion.id, val)}
-                            />
-                        )}
-                        {currentQuestion.type === 'checkbox' && (
-                            <CheckboxGroup
-                                options={currentQuestion.options || []}
-                                value={currentAnswer as string[]}
-                                onChange={(val) => updateAnswer(currentQuestion.id, val)}
-                            />
-                        )}
+                        {renderQuestionContent()}
                     </div>
 
                     <div className="flex justify-between mt-10 gap-4">
                         <button
                             onClick={handlePrev}
                             disabled={currentStep === 0}
-                            className={`flex items-center gap-2 px-6 py-4 rounded-xl font-bold transition-all ${currentStep === 0
-                                    ? "opacity-0 pointer-events-none"
-                                    : "bg-white/5 text-white hover:bg-white/10"
+                            className={`flex items-center gap-2 px-6 py-4 rounded-xl font-bold transition-all cursor-pointer ${currentStep === 0
+                                ? "opacity-0 pointer-events-none"
+                                : "bg-white/5 text-white hover:bg-white/10"
                                 }`}
                         >
                             <ChevronLeft className="w-5 h-5" />
@@ -203,9 +306,9 @@ const Quiz = () => {
                             <button
                                 onClick={handleSubmit}
                                 disabled={!isAnswered || isSubmitting}
-                                className={`flex items-center gap-2 px-8 py-4 rounded-xl font-bold transition-all shadow-lg ${isAnswered && !isSubmitting
-                                        ? "bg-green-600 text-white hover:bg-green-500 shadow-green-900/30"
-                                        : "bg-white/10 text-white/40 cursor-not-allowed"
+                                className={`flex items-center gap-2 px-8 py-4 rounded-xl font-bold transition-all shadow-lg cursor-pointer ${isAnswered && !isSubmitting
+                                    ? "bg-green-600 text-white hover:bg-green-500 shadow-green-900/30"
+                                    : "bg-white/10 text-white/40 cursor-not-allowed"
                                     }`}
                             >
                                 {isSubmitting ? "Отправка..." : "Отправить бриф"}
@@ -215,9 +318,9 @@ const Quiz = () => {
                             <button
                                 onClick={handleNext}
                                 disabled={!isAnswered}
-                                className={`flex items-center gap-2 px-8 py-4 rounded-xl font-bold transition-all shadow-lg ${isAnswered
-                                        ? "bg-blue-600 text-white hover:bg-blue-500 shadow-blue-900/30"
-                                        : "bg-white/10 text-white/40 cursor-not-allowed"
+                                className={`flex items-center gap-2 px-8 py-4 rounded-xl font-bold transition-all shadow-lg cursor-pointer ${isAnswered
+                                    ? "bg-blue-600 text-white hover:bg-blue-500 shadow-blue-900/30"
+                                    : "bg-white/10 text-white/40 cursor-not-allowed"
                                     }`}
                             >
                                 Далее
@@ -227,6 +330,16 @@ const Quiz = () => {
                     </div>
                 </div>
             </Slide>
+            {/* Modal Confirmations */}
+            <Modal
+                isOpen={isResetModalOpen}
+                onClose={() => setIsResetModalOpen(false)}
+                onConfirm={confirmFullReset}
+                title="Сброс ответов"
+                description="Вы уверены, что хотите сбросить все заполненные данные? Это действие нельзя будет отменить."
+                confirmLabel="Сбросить всё"
+                confirmVariant="danger"
+            />
         </div>
     );
 };

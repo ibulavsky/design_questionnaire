@@ -23,7 +23,7 @@ export default function Home() {
         </section>
 
         <footer className="mt-20 text-center text-white/20 text-sm animate-fade-in [animation-delay:400ms] opacity-0 fill-mode-forwards">
-          &copy; {new Date().getFullYear()} Design Studio. Все права защищены.
+          &copy; {new Date().getFullYear()}. Все права защищены.
         </footer>
       </div>
     </main>

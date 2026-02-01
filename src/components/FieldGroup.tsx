@@ -1,0 +1,65 @@
+'use client';
+
+import React from 'react';
+import TextInput from './questions/TextInput';
+import CheckboxGroup from './questions/CheckboxGroup';
+import RadioGroup from './questions/RadioGroup';
+import { Question, Answers } from '../lib/types';
+
+interface FieldGroupProps {
+    fields: Question[];
+    answers: Answers;
+    onUpdate: (questionId: string, value: string | string[]) => void;
+}
+
+const FieldGroup: React.FC<FieldGroupProps> = ({ fields, answers, onUpdate }) => {
+    return (
+        <div className="flex flex-col gap-8">
+            {fields.map((field) => {
+                const currentValue = answers[field.id];
+
+                return (
+                    <div key={field.id}>
+                        <label className="block text-lg font-semibold text-white mb-2">
+                            {field.title}
+                            {field.required && <span className="text-red-400 ml-1">*</span>}
+                        </label>
+                        {field.description && (
+                            <p className="text-white/50 text-sm mb-3">{field.description}</p>
+                        )}
+
+                        {(field.type === 'text' || field.type === 'textarea') && (
+                            <TextInput
+                                value={(currentValue as string) || ''}
+                                onChange={(val) => onUpdate(field.id, val)}
+                                placeholder={field.placeholder}
+                                isTextArea={field.type === 'textarea'}
+                            />
+                        )}
+
+                        {field.type === 'checkbox' && (
+                            <CheckboxGroup
+                                options={field.options || []}
+                                value={(currentValue as string[]) || []}
+                                onChange={(val) => onUpdate(field.id, val)}
+                                allowOther={field.allowOther}
+                            />
+                        )}
+
+                        {field.type === 'radio' && (
+                            <RadioGroup
+                                options={field.options || []}
+                                value={(currentValue as string) || ''}
+                                onChange={(val) => onUpdate(field.id, val)}
+                                name={field.id}
+                                allowOther={field.allowOther}
+                            />
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
+
+export default FieldGroup;
