@@ -17,40 +17,80 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ options, value = [], onCh
     };
 
     const isInternalOption = (val: string) => {
-        return options.some(opt => normalizeOption(opt).label === val) || val.includes(': ');
+        const checkRecursive = (opts: (string | QuestionOption)[]): boolean => {
+            return opts.some(opt => {
+                const normalized = normalizeOption(opt);
+                const optId = normalized.id || normalized.label;
+                if (val === optId || val.startsWith(`${optId}: `)) return true;
+                if (normalized.children) return checkRecursive(normalized.children);
+                return false;
+            });
+        };
+        return checkRecursive(options);
     };
 
     const customValue = value.find(v => !isInternalOption(v)) || '';
     const [isOtherActive, setIsOtherActive] = useState(!!customValue);
 
-    // Sync isOtherActive if customValue changes externally
     useEffect(() => {
         if (customValue) setIsOtherActive(true);
     }, [customValue]);
 
-    const toggleOption = (label: string) => {
-        const newValue = value.includes(label)
-            ? value.filter((v) => v !== label)
-            : [...value, label];
+    const toggleOption = (id: string) => {
+        const newValue = value.includes(id)
+            ? value.filter((v) => v !== id)
+            : [...value, id];
         onChange(newValue);
     };
 
-    const toggleChild = (parentLabel: string, childLabel: string) => {
-        const fullLabel = `${parentLabel}: ${childLabel}`;
-        toggleOption(fullLabel);
+    const isAnyChildSelected = (option: QuestionOption, prefix: string = ""): boolean => {
+        if (!option.children) return false;
+        const currentId = prefix ? `${prefix}: ${option.id || option.label}` : (option.id || option.label);
+
+        return option.children.some(child => {
+            const childId = `${currentId}: ${child.id || child.label}`;
+            if (value.includes(childId)) return true;
+            return isAnyChildSelected(child, currentId);
+        });
     };
 
-    const isParentSelected = (option: QuestionOption) => {
-        if (value.includes(option.label)) return true;
-        if (option.children) {
-            return option.children.some(child => value.includes(`${option.label}: ${child.label}`));
-        }
-        return false;
+    const RecursiveOption = ({ option, prefix = "", level = 0 }: { option: QuestionOption, prefix?: string, level?: number }) => {
+        const optId = option.id || option.label;
+        const fullId = prefix ? `${prefix}: ${optId}` : optId;
+        const isSelected = value.includes(fullId);
+        const hasChildren = option.children && option.children.length > 0;
+        const anyChildSelected = hasChildren && isAnyChildSelected(option, prefix);
+        const isPartiallySelected = anyChildSelected && !isSelected;
+
+        return (
+            <div className={`flex flex-col ${level > 0 ? 'ml-6 mt-2' : ''}`}>
+                <CheckboxItem
+                    label={option.label}
+                    description={option.description}
+                    checked={isSelected}
+                    partiallySelected={isPartiallySelected}
+                    onChange={() => toggleOption(fullId)}
+                    className={level > 0 ? '!p-3 !rounded-lg' : ''}
+                />
+
+                {hasChildren && (isSelected || isPartiallySelected) && (
+                    <div className="flex flex-col gap-2">
+                        {option.children!.map((child) => (
+                            <RecursiveOption
+                                key={child.id || child.label}
+                                option={child}
+                                prefix={fullId}
+                                level={level + 1}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
     };
 
     const handleCustomToggle = (active: boolean) => {
         if (!active) {
-            // Remove the custom value
             onChange(value.filter(v => isInternalOption(v)));
             setIsOtherActive(false);
         } else {
@@ -63,7 +103,6 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ options, value = [], onCh
         if (text) {
             onChange([...otherOptions, text]);
         } else {
-            // If text emptied, we keep isOtherActive but clear the actual value in Answers
             onChange(otherOptions);
         }
     };
@@ -72,44 +111,9 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ options, value = [], onCh
         <div className="flex flex-col gap-3">
             {options.map((opt) => {
                 const option = normalizeOption(opt);
-                const isSelected = value.includes(option.label);
-                const hasChildren = option.children && option.children.length > 0;
-                const isPartiallySelected = hasChildren && isParentSelected(option) && !isSelected;
-
-                return (
-                    <div key={option.label}>
-                        <CheckboxItem
-                            label={option.label}
-                            description={option.description}
-                            checked={isSelected}
-                            partiallySelected={isPartiallySelected}
-                            onChange={() => toggleOption(option.label)}
-                        />
-
-                        {/* Nested children */}
-                        {hasChildren && (isSelected || isPartiallySelected) && (
-                            <div className="ml-8 mt-2 flex flex-col gap-2">
-                                {option.children!.map((child) => {
-                                    const childLabel = `${option.label}: ${child.label}`;
-                                    const isChildSelected = value.includes(childLabel);
-
-                                    return (
-                                        <CheckboxItem
-                                            key={child.label}
-                                            label={child.label}
-                                            checked={isChildSelected}
-                                            onChange={() => toggleChild(option.label, child.label)}
-                                            className="!p-3 !rounded-lg"
-                                        />
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </div>
-                );
+                return <RecursiveOption key={option.id || option.label} option={option} />;
             })}
 
-            {/* Other Option */}
             {allowOther && (
                 <div className="mt-2">
                     <CheckboxItem

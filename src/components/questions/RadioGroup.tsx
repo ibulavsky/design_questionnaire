@@ -19,7 +19,10 @@ const RadioGroup: React.FC<RadioGroupProps> = ({ options, value, onChange, name 
 
     const isCustomValue = (val: string) => {
         if (!val) return false;
-        return !options.some(opt => normalizeOption(opt).label === val);
+        return !options.some(opt => {
+            const normalized = normalizeOption(opt);
+            return (normalized.id || normalized.label) === val;
+        });
     };
 
     const [isOtherActive, setIsOtherActive] = useState(isCustomValue(value));
@@ -30,9 +33,9 @@ const RadioGroup: React.FC<RadioGroupProps> = ({ options, value, onChange, name 
         }
     }, [value]);
 
-    const handleOptionSelect = (label: string) => {
+    const handleOptionSelect = (option: QuestionOption) => {
         setIsOtherActive(false);
-        onChange(label);
+        onChange(option.id || option.label);
     };
 
     const handleOtherSelect = () => {
@@ -47,16 +50,17 @@ const RadioGroup: React.FC<RadioGroupProps> = ({ options, value, onChange, name 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4" role="radiogroup">
                 {options.map((opt) => {
                     const option = normalizeOption(opt);
-                    const isSelected = !isOtherActive && value === option.label;
+                    const optId = option.id || option.label;
+                    const isSelected = !isOtherActive && value === optId;
 
                     return (
                         <RadioItem
-                            key={option.label}
+                            key={optId}
                             label={option.label}
                             description={option.description}
                             image={option.image}
                             checked={isSelected}
-                            onSelect={() => handleOptionSelect(option.label)}
+                            onSelect={() => handleOptionSelect(option)}
                             name={name}
                         />
                     );

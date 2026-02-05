@@ -4,18 +4,21 @@ import React from 'react';
 import TextInput from './questions/TextInput';
 import CheckboxGroup from './questions/CheckboxGroup';
 import RadioGroup from './questions/RadioGroup';
+import FileUpload from './questions/FileUpload';
 import { Question, Answers } from '../lib/types';
 
 interface FieldGroupProps {
     fields: Question[];
     answers: Answers;
-    onUpdate: (questionId: string, value: string | string[]) => void;
+    onUpdate: (questionId: string, value: string | string[] | (File | string)[]) => void;
 }
 
 const FieldGroup: React.FC<FieldGroupProps> = ({ fields, answers, onUpdate }) => {
     return (
         <div className="flex flex-col gap-8">
             {fields.map((field) => {
+                if (field.showIf && !field.showIf(answers)) return null;
+
                 const currentValue = answers[field.id];
 
                 return (
@@ -53,6 +56,13 @@ const FieldGroup: React.FC<FieldGroupProps> = ({ fields, answers, onUpdate }) =>
                                 onChange={(val) => onUpdate(field.id, val)}
                                 name={field.id}
                                 allowOther={field.allowOther}
+                            />
+                        )}
+
+                        {field.type === 'file' && (
+                            <FileUpload
+                                value={(currentValue as (File | string)[]) || []}
+                                onChange={(items: (File | string)[]) => onUpdate(field.id, items)}
                             />
                         )}
                     </div>

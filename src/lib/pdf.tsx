@@ -86,42 +86,59 @@ export const QuestionnairePDF: React.FC<PDFTemplateProps> = ({ answers }) => (
             </View>
 
             {QUESTIONS.map((q) => {
-                const answer = answers[q.id];
-                if (!answer) return null;
+                const renderField = (field: any, val: any) => {
+                    if (!val) return null;
 
-                // Handle file uploads (images)
-                if (q.type === 'file' && Array.isArray(answer)) {
-                    return (
-                        <View key={q.id} style={styles.section} wrap={false}>
-                            <Text style={styles.question}>{q.title}</Text>
-                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-                                {answer.map((item, idx) => {
-                                    const imgSrc = typeof item === 'string' ? item : (item as any).data;
-                                    if (!imgSrc) return null;
+                    // Handle file uploads (images)
+                    if (field.type === 'file' && Array.isArray(val)) {
+                        return (
+                            <View key={field.id} style={styles.section} wrap={false}>
+                                <Text style={styles.question}>{field.title}</Text>
+                                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                                    {val.map((item: any, idx: number) => {
+                                        const imgSrc = typeof item === 'string' ? item : item.data;
+                                        if (!imgSrc) return null;
 
-                                    return (
-                                        <View key={idx} style={{ width: '30%', marginBottom: 10 }}>
-                                            <PDFImage src={imgSrc} style={{ width: '100%' }} />
-                                            <Text style={{ fontSize: 8, color: '#666', marginTop: 2 }}>
-                                                {(item as any).name || `Изображение ${idx + 1}`}
-                                            </Text>
-                                        </View>
-                                    );
-                                })}
+                                        return (
+                                            <View key={idx} style={{ width: '30%', marginBottom: 10 }}>
+                                                <PDFImage src={imgSrc} style={{ width: '100%' }} />
+                                                <Text style={{ fontSize: 8, color: '#666', marginTop: 2 }}>
+                                                    {item.name || `Изображение ${idx + 1}`}
+                                                </Text>
+                                            </View>
+                                        );
+                                    })}
+                                </View>
                             </View>
+                        );
+                    }
+
+                    // Handle regular answers
+                    return (
+                        <View key={field.id} style={styles.section} wrap={false}>
+                            <Text style={styles.question}>{field.title}</Text>
+                            <Text style={styles.answer}>
+                                {Array.isArray(val) ? val.join(', ') : val}
+                            </Text>
+                        </View>
+                    );
+                };
+
+                if (q.type === 'group' && q.fields) {
+                    const groupAnswers = q.fields.map(f => ({ field: f, val: answers[f.id] })).filter(a => a.val);
+                    if (groupAnswers.length === 0) return null;
+
+                    return (
+                        <View key={q.id}>
+                            <Text style={[styles.question, { color: '#3b82f6', borderBottom: 1, borderBottomColor: '#eee', paddingBottom: 5, marginBottom: 10, marginTop: 10 }]}>
+                                {q.title}
+                            </Text>
+                            {groupAnswers.map(a => renderField(a.field, a.val))}
                         </View>
                     );
                 }
 
-                // Handle regular answers
-                return (
-                    <View key={q.id} style={styles.section} wrap={false}>
-                        <Text style={styles.question}>{q.title}</Text>
-                        <Text style={styles.answer}>
-                            {Array.isArray(answer) ? answer.join(', ') : answer}
-                        </Text>
-                    </View>
-                );
+                return renderField(q, answers[q.id]);
             })}
 
             <Text style={styles.footer}>

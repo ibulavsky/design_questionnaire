@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { QUESTIONS } from '../data/questions';
+import { QUESTIONS, THANK_YOU_MESSAGE } from '../data/questions';
 import { Answers, Question } from '../lib/types';
 import {
     saveAnswers, loadAnswers,
@@ -143,7 +143,8 @@ const Quiz = () => {
         if (!question) return false;
         if (question.type === 'group' && question.fields) {
             return question.fields.every(field => {
-                if (!field.required) return true;
+                const isVisible = !field.showIf || field.showIf(answers);
+                if (!isVisible || !field.required) return true;
                 const answer = answers[field.id];
                 return Array.isArray(answer) ? answer.length > 0 : !!answer;
             });
@@ -162,8 +163,8 @@ const Quiz = () => {
                     <CheckCircle2 className="w-10 h-10 text-green-500" />
                 </div>
                 <h1 className="text-3xl font-bold text-white mb-4">Спасибо за ответы!</h1>
-                <p className="text-white/60 max-w-md mx-auto mb-2">
-                    Ваш бриф успешно отправлен в Telegram и на Email.
+                <p className="text-white/60 max-w-md mx-auto mb-2 whitespace-pre-line">
+                    {THANK_YOU_MESSAGE}
                 </p>
                 <DownloadPDF answers={submittedAnswers} />
                 <div className="mt-12">
@@ -256,16 +257,20 @@ const Quiz = () => {
         }
     };
 
+    const visibleQuestions = QUESTIONS.filter(q => !q.showIf || q.showIf(answers));
+    const visibleTotal = visibleQuestions.length;
+    const visibleStepIndex = visibleQuestions.findIndex(q => q.id === currentQuestion.id);
+
     return (
         <div className="w-full">
             <div className="flex justify-between items-center mb-8">
                 <ResetButton type="full" onReset={handleFullReset} />
                 <div className="text-white/40 text-sm font-medium">
-                    Вопрос {currentStep + 1} из {QUESTIONS.length}
+                    Вопрос {visibleStepIndex + 1} из {visibleTotal}
                 </div>
             </div>
 
-            <ProgressBar current={currentStep} total={QUESTIONS.length} />
+            <ProgressBar current={visibleStepIndex} total={visibleTotal} />
 
             <Slide direction={direction} slideKey={currentQuestion.id}>
                 <div className="bg-white/[0.03] border border-white/10 p-8 rounded-3xl backdrop-blur-xl shadow-2xl">

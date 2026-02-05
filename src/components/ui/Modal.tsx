@@ -1,6 +1,5 @@
-'use client';
-
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
 interface ModalProps {
@@ -24,33 +23,41 @@ const Modal: React.FC<ModalProps> = ({
     onConfirm,
     confirmVariant = 'primary'
 }) => {
-    // Close on ESC key
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
             if (e.key === 'Escape') onClose();
         };
+
         if (isOpen) {
             document.addEventListener('keydown', handleEsc);
+            // Block background scroll only when modal is open
             document.body.style.overflow = 'hidden';
         }
+
         return () => {
             document.removeEventListener('keydown', handleEsc);
             document.body.style.overflow = 'unset';
         };
     }, [isOpen, onClose]);
 
-    if (!isOpen) return null;
+    if (!mounted || !isOpen) return null;
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+    return createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity cursor-pointer"
+                className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
                 onClick={onClose}
             />
 
             {/* Modal Content */}
-            <div className="relative w-full max-w-md bg-white/5 border border-white/10 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-xl animate-in fade-in zoom-in duration-200">
+            <div className="relative w-full max-w-md bg-[#161618] border border-white/10 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-xl font-bold text-white uppercase tracking-wider">
@@ -96,7 +103,8 @@ const Modal: React.FC<ModalProps> = ({
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

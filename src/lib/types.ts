@@ -4,6 +4,7 @@ export type AnswerType = string | string[] | (File | string)[];
 
 export interface QuestionOption {
     label: string;
+    id?: string;
     description?: string;
     image?: string;
     children?: QuestionOption[];
@@ -19,6 +20,7 @@ export interface Question {
     placeholder?: string;
     fields?: Question[]; // For group type - multiple fields on one slide
     allowOther?: boolean;
+    showIf?: (answers: Answers) => boolean;
 }
 
 export interface Answers {
