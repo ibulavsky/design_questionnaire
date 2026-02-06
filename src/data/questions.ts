@@ -12,21 +12,9 @@ export const QUESTIONS: Question[] = [
                 id: 'company_name',
                 type: 'text',
                 title: 'Название компании / бренда',
-                description: 'Например: "ООО Ромашка", "Ромашка", "Ромашка", "Ромашка"',
+                description: 'Например: "ООО Ромашка", "Ромашка", "ромашка", "РОМАШКА"',
                 required: true,
             },
-            // {
-            //     id: 'company_name_variants',
-            //     type: 'checkbox',
-            //     title: 'В каком виде допустимо написание?',
-            //     required: true,
-            //     options: [
-            //         { label: 'только строчные буквы', description: 'например "ромашка"' },
-            //         { label: 'только прописные буквы', description: 'например "РОМАШКА"' },
-            //         { label: 'первая прописная, остальные строчные', description: 'например "Ромашка"' },
-            //     ],
-            //     allowOther: true,
-            // },
             {
                 id: 'name_meaning',
                 type: 'textarea',
@@ -65,12 +53,6 @@ export const QUESTIONS: Question[] = [
                 id: 'brand_idea',
                 type: 'textarea',
                 title: 'Есть ли у бренда идея, миссия, ценности? Если да - расскажите о них.',
-            },
-            {
-                id: 'current_site',
-                type: 'text',
-                title: 'Адрес текущего сайта (если есть)',
-                placeholder: 'https://...',
             },
         ],
     },
@@ -171,6 +153,12 @@ export const QUESTIONS: Question[] = [
                 showIf: (answers: Answers) => answers.business_sector === 'B2C',
             },
             {
+                id: 'client_profile_b2b',
+                type: 'text',
+                title: 'Кто ваш основной клиент? (чем занимается, размер компании, сфера деятельности)',
+                showIf: (answers: Answers) => answers.business_sector === 'B2B',
+            },
+            {
                 id: 'client_profile_geography',
                 type: 'text',
                 title: 'География (город, страна)',
@@ -263,7 +251,7 @@ export const QUESTIONS: Question[] = [
             {
                 id: 'disliked_companies',
                 type: 'textarea',
-                title: 'Какие компании из вашей сферы вам НЕ нравятся. Почему?',
+                title: 'Какие компании из вашей сферы вам не нравятся. Почему?',
             },
             {
                 id: 'differentiation',
@@ -282,7 +270,7 @@ export const QUESTIONS: Question[] = [
         fields: [
             {
                 id: 'name_casing',
-                type: 'radio',
+                type: 'checkbox',
                 title: 'В каком виде допустимо написание компании?',
                 options: [
                     { label: 'Только строчные' },
@@ -294,7 +282,7 @@ export const QUESTIONS: Question[] = [
             },
             {
                 id: 'logo_style_pref',
-                type: 'radio',
+                type: 'checkbox',
                 title: 'Какой вариант логотипа для вас наиболее предпочтителен?',
                 options: [
                     { label: 'Шрифтовой', id: 'text', image: '/images/logo-types/text.png' },
@@ -495,7 +483,7 @@ export const QUESTIONS: Question[] = [
                 id: 'phone',
                 type: 'text',
                 required: true,
-                title: 'Ваш телефон | Telegram | WhatsApp',
+                title: 'Ваш телефон | Telegram | Viber',
             },
             {
                 id: 'email',
@@ -506,4 +494,4 @@ export const QUESTIONS: Question[] = [
     },
 ];
 
-export const THANK_YOU_MESSAGE = "Спасибо за ваши ответы. В течение 3 рабочих дней я свяжусь с вами, чтобы обсудить проект. До встречи!";
+export const THANK_YOU_MESSAGE = "В течение 3 рабочих дней я свяжусь с вами, чтобы обсудить проект. До встречи!";

@@ -7,8 +7,13 @@
 }
 
 :root {
-  --background: #0a0a0b;
-  --foreground: #ffffff;
+  --background: #FAFAFA;
+  --foreground: #1F2937;
+  --card-bg: #FFFFFF;
+  --border: #E5E7EB;
+  --muted: #6B7280;
+  --accent: #2563EB;
+  --accent-hover: #1D4ED8;
 }
 
 body {
@@ -27,24 +32,6 @@ input[type="radio"],
 input[type="file"],
 input[type="submit"] {
   cursor: pointer;
-}
-
-/* Custom background pattern */
-.bg-grid {
-  background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
-
-.bg-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 50% -20%, rgba(59, 130, 246, 0.15), transparent 70%);
-  pointer-events: none;
 }
 
 /* Animations */

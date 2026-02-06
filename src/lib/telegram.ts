@@ -57,3 +57,28 @@ export const sendMediaGroupToTelegram = async (files: { buffer: Buffer; filename
         return false;
     }
 };
+
+export const sendDocumentToTelegram = async (buffer: Buffer, filename: string, caption?: string) => {
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+
+    if (!token || !chatId) return false;
+
+    const formData = new FormData();
+    formData.append('chat_id', chatId);
+    formData.append('document', new Blob([new Uint8Array(buffer)]), filename);
+    if (caption) {
+        formData.append('caption', caption);
+    }
+
+    try {
+        const response = await fetch(`https://api.telegram.org/bot${token}/sendDocument`, {
+            method: 'POST',
+            body: formData,
+        });
+        return response.ok;
+    } catch (error) {
+        console.error('Error sending document to Telegram:', error);
+        return false;
+    }
+};

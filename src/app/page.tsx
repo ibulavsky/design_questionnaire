@@ -2,19 +2,18 @@ import Quiz from "@/components/Quiz";
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen bg-grid">
-      <div className="bg-glow" />
-
-      <div className="container mx-auto px-4 py-12 md:py-24 max-w-4xl relative z-10">
+    <main className="min-h-screen bg-[var(--background)]">
+      <div className="container mx-auto px-4 py-12 md:py-24 max-w-3xl">
         <header className="text-center mb-16 animate-fade-in">
-          <div className="inline-block px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold tracking-widest uppercase mb-4">
-            Design Brief
+          <div className="mb-4">
+            <span className="inline-block text-gray-900 font-bold tracking-[0.3em] leading-[1] uppercase text-sm">Добро пожаловать <br className="hidden md:block" /> в space</span>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight">
-            Расскажите о вашем <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">проекте</span>
+          <h1 className="text-4xl uppercase md:text-6xl font-bold text-gray-900 mb-6 tracking-tight leading-[1.1]">
+            Давайте вместе поможем <br className="hidden md:block" />
+            вашему бренду сиять сильнее
           </h1>
-          <p className="text-lg text-white/50 max-w-2xl mx-auto">
-            Заполните небольшую анкету, чтобы мы могли лучше понять ваши задачи и подготовить идеальное предложение.
+          <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
+            Пожалуйста, ответьте на эти вопросы. Это поможет мне лучше понять, как помочь вашей компании стать ярче конкурентов ✨
           </p>
         </header>
 
@@ -22,7 +21,7 @@ export default function Home() {
           <Quiz />
         </section>
 
-        <footer className="mt-20 text-center text-white/20 text-sm animate-fade-in [animation-delay:400ms] opacity-0 fill-mode-forwards">
+        <footer className="mt-20 text-center text-gray-400 text-sm animate-fade-in [animation-delay:400ms] opacity-0 fill-mode-forwards">
           &copy; {new Date().getFullYear()}. Все права защищены.
         </footer>
       </div>

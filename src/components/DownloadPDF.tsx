@@ -16,7 +16,7 @@ const DownloadPDF: React.FC<DownloadPDFProps> = ({ answers }) => {
             <PDFDownloadLink
                 document={<QuestionnairePDF answers={answers} />}
                 fileName="design-brief.pdf"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 rounded-xl text-white/80 hover:bg-white/10 hover:text-white transition-all text-sm font-medium"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-all text-sm font-medium"
             >
                 {({ loading }) => (
                     <>

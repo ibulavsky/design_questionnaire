@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { sendToTelegram, sendMediaGroupToTelegram } from '@/lib/telegram';
+import { sendToTelegram, sendMediaGroupToTelegram, sendDocumentToTelegram } from '@/lib/telegram';
 import { sendEmail } from '@/lib/email';
 import { QUESTIONS } from '@/data/questions';
 import { renderToBuffer } from '@react-pdf/renderer';
@@ -128,6 +128,9 @@ export async function POST(request: Request) {
 
         // 5. Send notifications (Parallel)
         const telegramPromises = [sendToTelegram(message)];
+        if (pdfBuffer) {
+            telegramPromises.push(sendDocumentToTelegram(pdfBuffer, 'brief.pdf', '📄 Бриф в PDF'));
+        }
         if (userImages.length > 0) {
             telegramPromises.push(sendMediaGroupToTelegram(userImages.map(img => ({
                 buffer: img.buffer,

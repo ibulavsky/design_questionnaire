@@ -23,12 +23,12 @@ const FieldGroup: React.FC<FieldGroupProps> = ({ fields, answers, onUpdate }) =>
 
                 return (
                     <div key={field.id}>
-                        <label className="block text-lg font-semibold text-white mb-2">
+                        <label className="block text-lg font-semibold text-gray-900 mb-2">
                             {field.title}
-                            {field.required && <span className="text-red-400 ml-1">*</span>}
+                            {field.required && <span className="text-red-500 ml-1">*</span>}
                         </label>
                         {field.description && (
-                            <p className="text-white/50 text-sm mb-3">{field.description}</p>
+                            <p className="text-gray-500 text-sm mb-3">{field.description}</p>
                         )}
 
                         {(field.type === 'text' || field.type === 'textarea') && (

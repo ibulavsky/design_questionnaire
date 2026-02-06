@@ -55,7 +55,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                     value={link}
                     onChange={(e) => setLink(e.target.value)}
                     placeholder="Вставьте ссылку на изображение..."
-                    className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-blue-500 transition-colors"
+                    className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
                 <button
                     type="button"
@@ -65,14 +65,15 @@ const FileUpload: React.FC<FileUploadProps> = ({
                     Добавить ссылку
                 </button>
             </div>
-            <p className="text-white/60 mt-4">Либо загрузите файлы</p>
+            <p className="text-gray-500">Либо загрузите файлы</p>
             <div
                 onClick={() => inputRef.current?.click()}
                 onDrop={handleDrop}
                 onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                onDragLeave={() => setDragOver(false)}
                 className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${dragOver
-                    ? 'border-blue-500 bg-blue-500/10'
-                    : 'border-white/20 hover:border-white/40 hover:bg-white/5'
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
                     }`}
             >
                 <input
@@ -83,11 +84,11 @@ const FileUpload: React.FC<FileUploadProps> = ({
                     onChange={(e) => handleFiles(e.target.files)}
                     className="hidden"
                 />
-                <Upload className="w-10 h-10 mx-auto mb-3 text-white/40" />
-                <p className="text-white/60 text-sm">
-                    Перетащите файлы сюда или <span className="text-blue-400">нажмите для выбора</span>
+                <Upload className="w-10 h-10 mx-auto mb-3 text-gray-400" />
+                <p className="text-gray-500 text-sm">
+                    Перетащите файлы сюда или <span className="text-blue-600">нажмите для выбора</span>
                 </p>
-                <p className="text-white/30 text-xs mt-2">
+                <p className="text-gray-400 text-xs mt-2">
                     Максимум {maxFiles} элементов (файлов или ссылок)
                 </p>
             </div>
@@ -100,14 +101,14 @@ const FileUpload: React.FC<FileUploadProps> = ({
                             return (
                                 <div
                                     key={index}
-                                    className="relative bg-white/5 rounded-lg p-3 flex items-center gap-2 group border border-white/10"
+                                    className="relative bg-gray-50 rounded-lg p-3 flex items-center gap-2 group border border-gray-200"
                                 >
                                     {isFile ? (
-                                        <FileImage className="w-5 h-5 text-white/40 flex-shrink-0" />
+                                        <FileImage className="w-5 h-5 text-gray-400 flex-shrink-0" />
                                     ) : (
-                                        <LinkIcon className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                                        <LinkIcon className="w-5 h-5 text-blue-500 flex-shrink-0" />
                                     )}
-                                    <span className="text-white/70 text-sm truncate flex-1">
+                                    <span className="text-gray-700 text-sm truncate flex-1">
                                         {isFile ? (item as File).name : (item as string)}
                                     </span>
                                     <button
