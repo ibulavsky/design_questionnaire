@@ -12,7 +12,6 @@ export const QUESTIONS: Question[] = [
                 id: 'company_name',
                 type: 'text',
                 title: 'Название компании / бренда',
-                description: 'Например: "ООО Ромашка", "Ромашка", "ромашка", "РОМАШКА"',
                 required: true,
             },
             {

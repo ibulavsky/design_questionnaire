@@ -4,12 +4,14 @@ import React, { useEffect } from 'react';
 import { useQuizStore, useCurrentQuestion } from '@/store/quizStore';
 import Modal from './ui/Modal';
 import ResetButton from './ResetButton';
+import WelcomeScreen from './screens/WelcomeScreen';
 import ThankYouScreen from './screens/ThankYouScreen';
 import QuizScreen from './screens/QuizScreen';
 
 const Quiz = () => {
     const {
         currentStep,
+        isStarted,
         isSubmitted,
         submittedAnswers,
         isResetModalOpen,
@@ -28,6 +30,11 @@ const Quiz = () => {
     // Loading state
     if (currentStep === -1) return null;
 
+    // Welcome screen
+    if (!isStarted) {
+        return <WelcomeScreen />;
+    }
+
     // Thank you screen
     if (isSubmitted && submittedAnswers) {
         return <ThankYouScreen answers={submittedAnswers} />;
@@ -37,7 +44,7 @@ const Quiz = () => {
     if (!currentQuestion) {
         return (
             <div className="text-center py-20">
-                <p className="text-white mb-4">Произошла ошибка загрузки вопроса.</p>
+                <p className="text-gray-900 mb-4 font-medium">Произошла ошибка загрузки вопроса.</p>
                 <ResetButton type="full" onReset={openResetModal} />
             </div>
         );

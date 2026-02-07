@@ -93,7 +93,7 @@ const Modal: React.FC<ModalProps> = ({
                                 }}
                                 className={`flex-1 px-4 py-3 rounded-xl font-semibold text-sm transition-all cursor-pointer ${confirmVariant === 'danger'
                                     ? 'bg-red-600 hover:bg-red-700 text-white'
-                                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                    : 'bg-black hover:bg-gray-800 text-white'
                                     }`}
                             >
                                 {confirmLabel || 'Подтвердить'}

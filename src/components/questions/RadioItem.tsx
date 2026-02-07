@@ -31,8 +31,8 @@ const RadioItem: React.FC<RadioItemProps> = ({
             <label
                 onClick={onSelect}
                 className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col items-center gap-3 h-full ${checked
-                    ? "bg-blue-50 border-blue-500 text-gray-900"
-                    : "bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100 hover:border-gray-300"
+                    ? "bg-white border-black text-black"
+                    : "bg-white border-gray-200 text-gray-700 hover:border-black"
                     } ${className}`}
             >
                 <input
@@ -56,10 +56,10 @@ const RadioItem: React.FC<RadioItemProps> = ({
 
                 <div className="flex items-center gap-3 w-full">
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${checked
-                        ? "border-blue-600"
+                        ? "border-black"
                         : "border-gray-300"
                         }`}>
-                        {checked && <div className="w-2.5 h-2.5 rounded-full bg-blue-600" />}
+                        {checked && <div className="w-2.5 h-2.5 rounded-full bg-black" />}
                     </div>
 
                     <div className="flex flex-col flex-1 pl-1 text-left">
@@ -88,7 +88,7 @@ const RadioItem: React.FC<RadioItemProps> = ({
                         value={label === "Свой вариант" ? "" : label}
                         onChange={(e) => onLabelChange?.(e.target.value)}
                         placeholder="Введите ваш вариант..."
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
                         autoFocus
                     />
                 </div>

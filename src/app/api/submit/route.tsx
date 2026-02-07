@@ -14,6 +14,7 @@ export async function POST(request: Request) {
         // Parse FormData
         for (const [key, value] of formData.entries()) {
             if (key.startsWith('file_')) {
+                if (!(value instanceof Blob)) continue;
                 const file = value as File;
                 const buffer = Buffer.from(await file.arrayBuffer());
                 const questionId = key.replace('file_', '');

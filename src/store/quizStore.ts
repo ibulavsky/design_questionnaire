@@ -17,9 +17,11 @@ interface QuizState {
     isSubmitted: boolean;
     submittedAnswers: Answers | null;
     isResetModalOpen: boolean;
+    isStarted: boolean;
 
     // Actions
     init: () => void;
+    startQuiz: () => void;
     next: () => void;
     prev: () => void;
     updateAnswer: (questionId: string, value: string | string[] | (File | string)[]) => void;
@@ -31,7 +33,7 @@ interface QuizState {
 }
 
 const scrollToTop = () => {
-    window.scrollTo({ top: 500, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 export const useQuizStore = create<QuizState>((set, get) => ({
@@ -42,17 +44,28 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     isSubmitted: false,
     submittedAnswers: null,
     isResetModalOpen: false,
+    isStarted: false,
 
     init: () => {
         const savedAnswers = loadAnswers();
         let savedStep = loadCurrentStep();
+        const hasAnswers = Object.keys(savedAnswers).length > 0;
 
         if (savedStep >= QUESTIONS.length || savedStep < 0) {
             savedStep = 0;
             saveCurrentStep(0);
         }
 
-        set({ answers: savedAnswers, currentStep: savedStep });
+        set({
+            answers: savedAnswers,
+            currentStep: savedStep,
+            isStarted: hasAnswers || savedStep > 0
+        });
+    },
+
+    startQuiz: () => {
+        set({ isStarted: true, currentStep: 0 });
+        saveCurrentStep(0);
     },
 
     next: () => {
@@ -98,6 +111,7 @@ export const useQuizStore = create<QuizState>((set, get) => ({
         set({
             answers: {},
             currentStep: 0,
+            isStarted: false,
             isResetModalOpen: false
         });
         saveCurrentStep(0);
@@ -130,15 +144,23 @@ export const useQuizStore = create<QuizState>((set, get) => ({
         try {
             const formData = new FormData();
 
+            const cleanAnswers = { ...answers };
             Object.keys(answers).forEach(key => {
                 const value = answers[key];
-                if (Array.isArray(value) && value[0] instanceof File) {
-                    value.forEach(file => {
-                        formData.append(`file_${key}`, file);
+                if (Array.isArray(value)) {
+                    const files = value.filter(item => item instanceof File);
+                    const nonFiles = value.filter(item => !(item instanceof File));
+
+                    files.forEach(file => {
+                        formData.append(`file_${key}`, file as File);
                     });
-                } else {
-                    formData.append(key, JSON.stringify(value));
+
+                    cleanAnswers[key] = nonFiles;
                 }
+            });
+
+            Object.keys(cleanAnswers).forEach(key => {
+                formData.append(key, JSON.stringify(cleanAnswers[key]));
             });
 
             const response = await fetch('/api/submit', {

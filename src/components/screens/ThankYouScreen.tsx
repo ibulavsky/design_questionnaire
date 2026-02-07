@@ -24,7 +24,7 @@ const ThankYouScreen: React.FC<ThankYouScreenProps> = ({ answers }) => {
             <div className="mt-12">
                 <button
                     onClick={() => window.location.reload()}
-                    className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all"
+                    className="px-8 py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition-all font-bold"
                 >
                     Вернуться на главную
                 </button>

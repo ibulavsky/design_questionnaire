@@ -10,7 +10,7 @@ interface TextInputProps {
 }
 
 const TextInput: React.FC<TextInputProps> = ({ value, onChange, placeholder, isTextArea }) => {
-    const commonClasses = "w-full p-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all";
+    const commonClasses = "w-full p-4 rounded-xl bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all";
 
     if (isTextArea) {
         return (

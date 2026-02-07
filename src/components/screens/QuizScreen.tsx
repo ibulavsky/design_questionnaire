@@ -17,7 +17,7 @@ import CheckboxGroup from '../questions/CheckboxGroup';
 import FileUpload from '../questions/FileUpload';
 import FieldGroup from '../FieldGroup';
 import ResetButton from '../ResetButton';
-import { ChevronLeft, ChevronRight, Send } from 'lucide-react';
+import { Send, RotateCcw } from 'lucide-react';
 
 const QuizScreen = () => {
     const {
@@ -106,17 +106,26 @@ const QuizScreen = () => {
 
     return (
         <div className="w-full">
-            <div className="flex justify-between items-center mb-6">
-                <ResetButton type="full" onReset={openResetModal} />
-                <div className="text-gray-400 text-sm font-medium">
-                    Вопрос {visibleStepIndex + 1} из {visibleTotal}
+            <div className="max-w-2xl mx-auto flex justify-between items-end mb-2 px-1">
+                <div className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
+                    {Math.round(Math.min(Math.max((visibleStepIndex / (visibleTotal - 1)) * 100, 0), 100))}%
+                </div>
+                <div className="flex items-center gap-4">
+                    <div className="text-[10px] font-bold tracking-widest text-gray-400 uppercase opacity-80">
+                        {visibleStepIndex + 1} <span className="mx-0.5 text-gray-300">/</span> {visibleTotal}
+                    </div>
+                    <button
+                        onClick={openResetModal}
+                        className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer group"
+                        title="Начать заново"
+                    >
+                        <RotateCcw className="w-3.5 h-3.5 group-hover:rotate-180 transition-transform duration-500" />
+                    </button>
                 </div>
             </div>
-
             <ProgressBar current={visibleStepIndex} total={visibleTotal} />
-
             <Slide direction={direction} slideKey={currentQuestion.id}>
-                <div className="bg-white border border-gray-100 p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                <div className="bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                     <div className="flex justify-between items-start mb-6">
                         <div>
                             <h2 className="text-2xl font-semibold text-gray-900 mb-2">{currentQuestion.title}</h2>
@@ -140,8 +149,7 @@ const QuizScreen = () => {
                                 : "text-gray-600 hover:bg-gray-100"
                                 }`}
                         >
-                            <ChevronLeft className="w-5 h-5" />
-                            Назад
+                            НАЗАД
                         </button>
 
                         {isLastStep ? (
@@ -161,12 +169,11 @@ const QuizScreen = () => {
                                 onClick={next}
                                 disabled={!isAnswered}
                                 className={`flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-all ${isAnswered
-                                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                                    ? "bg-black text-white hover:bg-gray-100 hover:text-gray-600"
                                     : "bg-gray-100 text-gray-400 cursor-not-allowed"
                                     }`}
                             >
-                                Далее
-                                <ChevronRight className="w-5 h-5" />
+                                ДАЛЕЕ
                             </button>
                         )}
                     </div>
