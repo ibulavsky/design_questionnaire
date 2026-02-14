@@ -1,6 +1,6 @@
 export type QuestionType = 'text' | 'textarea' | 'radio' | 'checkbox' | 'file' | 'group';
 
-export type AnswerType = string | string[] | (File | string)[];
+export type AnswerType = string | string[] | (string | { name: string; data: string; })[];
 
 export interface QuestionOption {
     label: string;

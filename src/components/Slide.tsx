@@ -28,7 +28,7 @@ const Slide: React.FC<SlideProps> = ({ children, direction, slideKey }) => {
     };
 
     return (
-        <div className="relative w-full max-w-2xl mx-auto overflow-hidden min-h-[400px]">
+        <div className="relative w-full max-w-2xl mx-auto overflow-x-hidden min-h-[400px]">
             <AnimatePresence initial={false} custom={direction} mode="wait">
                 <motion.div
                     key={slideKey}

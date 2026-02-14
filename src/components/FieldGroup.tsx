@@ -10,7 +10,7 @@ import { Question, Answers } from '../lib/types';
 interface FieldGroupProps {
     fields: Question[];
     answers: Answers;
-    onUpdate: (questionId: string, value: string | string[] | (File | string)[]) => void;
+    onUpdate: (questionId: string, value: string | string[] | (string | { name: string; data: string; })[]) => void;
 }
 
 const FieldGroup: React.FC<FieldGroupProps> = ({ fields, answers, onUpdate }) => {
@@ -23,12 +23,12 @@ const FieldGroup: React.FC<FieldGroupProps> = ({ fields, answers, onUpdate }) =>
 
                 return (
                     <div key={field.id}>
-                        <label className="block text-lg font-semibold text-gray-900 mb-2">
+                        <label className="block text-xs font-light uppercase tracking-widest text-black mb-3">
                             {field.title}
                             {field.required && <span className="text-red-500 ml-1">*</span>}
                         </label>
                         {field.description && (
-                            <p className="text-gray-500 text-sm mb-3">{field.description}</p>
+                            <p className="text-black/60 text-sm font-light mb-3">{field.description}</p>
                         )}
 
                         {(field.type === 'text' || field.type === 'textarea') && (
@@ -61,8 +61,8 @@ const FieldGroup: React.FC<FieldGroupProps> = ({ fields, answers, onUpdate }) =>
 
                         {field.type === 'file' && (
                             <FileUpload
-                                value={(currentValue as (File | string)[]) || []}
-                                onChange={(items: (File | string)[]) => onUpdate(field.id, items)}
+                                value={(currentValue as (string | { name: string, data: string })[]) || []}
+                                onChange={(items: (string | { name: string, data: string })[]) => onUpdate(field.id, items)}
                             />
                         )}
                     </div>

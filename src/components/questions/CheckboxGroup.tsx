@@ -67,6 +67,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ options, value = [], onCh
                 <CheckboxItem
                     label={option.label}
                     description={option.description}
+                    image={option.image}
                     checked={isSelected}
                     partiallySelected={isPartiallySelected}
                     onChange={() => toggleOption(fullId)}
@@ -109,10 +110,12 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ options, value = [], onCh
 
     return (
         <div className="flex flex-col gap-3">
-            {options.map((opt) => {
-                const option = normalizeOption(opt);
-                return <RecursiveOption key={option.id || option.label} option={option} />;
-            })}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                {options.map((opt) => {
+                    const option = normalizeOption(opt);
+                    return <RecursiveOption key={option.id || option.label} option={option} />;
+                })}
+            </div>
 
             {allowOther && (
                 <div className="mt-2">

@@ -8,28 +8,35 @@ import { Download, FileText } from 'lucide-react';
 
 interface DownloadPDFProps {
     answers: Answers;
+    children?: React.ReactNode;
 }
 
-const DownloadPDF: React.FC<DownloadPDFProps> = ({ answers }) => {
+const DownloadPDF: React.FC<DownloadPDFProps> = ({ answers, children }) => {
     return (
-        <div className="mt-8">
+        <div className="w-full">
             <PDFDownloadLink
                 document={<QuestionnairePDF answers={answers} />}
                 fileName="design-brief.pdf"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-200 hover:text-gray-900 transition-all text-sm font-medium"
+                className="w-full"
             >
                 {({ loading }) => (
-                    <>
-                        {loading ? (
-                            <span>Генерация PDF...</span>
-                        ) : (
-                            <>
-                                <FileText className="w-4 h-4" />
-                                <span>Скачать бриф в PDF</span>
-                                <Download className="w-4 h-4 ml-1" />
-                            </>
-                        )}
-                    </>
+                    children ? (
+                        <div className={loading ? "opacity-50 pointer-events-none" : ""}>
+                            {children}
+                        </div>
+                    ) : (
+                        <button className="inline-flex items-center gap-2 px-6 py-3 bg-black/5 border border-black/10 rounded-xl text-black/60 hover:bg-black/10 hover:text-black transition-all text-sm font-medium w-full justify-center">
+                            {loading ? (
+                                <span>Генерация PDF...</span>
+                            ) : (
+                                <>
+                                    <FileText className="w-4 h-4" />
+                                    <span>Скачать бриф в PDF</span>
+                                    <Download className="w-4 h-4 ml-1" />
+                                </>
+                            )}
+                        </button>
+                    )
                 )}
             </PDFDownloadLink>
         </div>

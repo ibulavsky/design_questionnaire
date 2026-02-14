@@ -56,22 +56,22 @@ const Modal: React.FC<ModalProps> = ({
             />
 
             {/* Modal Content */}
-            <div className="relative w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="relative w-full max-w-md bg-white border border-black/10 rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-200">
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-xl font-semibold text-gray-900">
+                        <h3 className="text-xl font-semibold text-black">
                             {title}
                         </h3>
                         <button
                             onClick={onClose}
-                            className="p-1 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
+                            className="p-1 rounded-full text-black/40 hover:text-black/60 hover:bg-black/5 transition-colors cursor-pointer"
                         >
                             <X className="w-5 h-5" />
                         </button>
                     </div>
 
                     {description && (
-                        <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+                        <p className="text-black/60 text-sm mb-6 leading-relaxed">
                             {description}
                         </p>
                     )}
@@ -81,7 +81,7 @@ const Modal: React.FC<ModalProps> = ({
                     <div className="flex gap-3 mt-8">
                         <button
                             onClick={onClose}
-                            className="flex-1 px-4 py-3 rounded-xl bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-all text-sm cursor-pointer"
+                            className="flex-1 px-4 py-3 rounded-xl bg-black/5 text-black font-medium hover:bg-black/10 transition-all text-sm cursor-pointer"
                         >
                             Отмена
                         </button>
@@ -93,7 +93,7 @@ const Modal: React.FC<ModalProps> = ({
                                 }}
                                 className={`flex-1 px-4 py-3 rounded-xl font-semibold text-sm transition-all cursor-pointer ${confirmVariant === 'danger'
                                     ? 'bg-red-600 hover:bg-red-700 text-white'
-                                    : 'bg-black hover:bg-gray-800 text-white'
+                                    : 'bg-black hover:bg-gray-900 text-white'
                                     }`}
                             >
                                 {confirmLabel || 'Подтвердить'}

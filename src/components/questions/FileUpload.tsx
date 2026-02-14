@@ -4,8 +4,8 @@ import React, { useRef, useState } from 'react';
 import { Upload, X, FileImage, Link as LinkIcon } from 'lucide-react';
 
 interface FileUploadProps {
-    value: (File | string)[];
-    onChange: (items: (File | string)[]) => void;
+    value: (string | { name: string, data: string })[];
+    onChange: (items: (string | { name: string, data: string })[]) => void;
     maxFiles?: number;
     accept?: string;
 }
@@ -20,10 +20,27 @@ const FileUpload: React.FC<FileUploadProps> = ({
     const [dragOver, setDragOver] = useState(false);
     const [link, setLink] = useState('');
 
-    const handleFiles = (files: FileList | null) => {
+    const fileToBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = error => reject(error);
+        });
+    };
+
+    const handleFiles = async (files: FileList | null) => {
         if (!files) return;
-        const newFiles = Array.from(files).slice(0, maxFiles - value.length);
-        onChange([...value, ...newFiles]);
+        const newFilesList = Array.from(files).slice(0, maxFiles - value.length);
+
+        const processedFiles = await Promise.all(
+            newFilesList.map(async (file) => ({
+                name: file.name,
+                data: await fileToBase64(file)
+            }))
+        );
+
+        onChange([...value, ...processedFiles]);
     };
 
     const addLink = () => {
@@ -55,17 +72,17 @@ const FileUpload: React.FC<FileUploadProps> = ({
                     value={link}
                     onChange={(e) => setLink(e.target.value)}
                     placeholder="Вставьте ссылку на изображение..."
-                    className="flex-1 bg-white border border-gray-200 rounded-lg px-4 py-2 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
+                    className="flex-1 bg-white border border-black/10 rounded-2xl px-4 py-2 text-black text-sm font-light focus:outline-none focus:border-gray-400 transition-all"
                 />
                 <button
                     type="button"
                     onClick={addLink}
-                    className="px-4 py-2 bg-black hover:bg-gray-800 text-white rounded-lg text-sm transition-colors whitespace-nowrap"
+                    className="px-4 py-2 bg-black hover:bg-gray-900 text-white rounded-full text-sm font-light transition-colors whitespace-nowrap"
                 >
                     Добавить ссылку
                 </button>
             </div>
-            <p className="text-gray-500">Либо загрузите файлы</p>
+            <p className="text-black/60">Либо загрузите файлы</p>
             <div
                 onClick={() => inputRef.current?.click()}
                 onDrop={handleDrop}
@@ -73,7 +90,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                 onDragLeave={() => setDragOver(false)}
                 className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${dragOver
                     ? 'border-black bg-white'
-                    : 'border-gray-200 hover:border-black hover:bg-white'
+                    : 'border-black/10 hover:border-black hover:bg-white'
                     }`}
             >
                 <input
@@ -84,11 +101,11 @@ const FileUpload: React.FC<FileUploadProps> = ({
                     onChange={(e) => handleFiles(e.target.files)}
                     className="hidden"
                 />
-                <Upload className="w-10 h-10 mx-auto mb-3 text-gray-400" />
-                <p className="text-gray-500 text-sm">
-                    Перетащите файлы сюда или <span className="text-black font-semibold">нажмите для выбора</span>
+                <Upload className="w-10 h-10 mx-auto mb-3 text-black/40" />
+                <p className="text-black/60 text-sm">
+                    Перетащите файлы сюда или <span className="text-black font-normal">нажмите для выбора</span>
                 </p>
-                <p className="text-gray-400 text-xs mt-2">
+                <p className="text-black/40 text-xs mt-2">
                     Максимум {maxFiles} элементов (файлов или ссылок)
                 </p>
             </div>
@@ -97,19 +114,19 @@ const FileUpload: React.FC<FileUploadProps> = ({
                 value.length > 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                         {value.map((item, index) => {
-                            const isFile = item instanceof File;
+                            const isDataFile = typeof item === 'object' && item !== null && 'data' in item;
                             return (
                                 <div
                                     key={index}
-                                    className="relative bg-white rounded-lg p-3 flex items-center gap-2 group border border-gray-200"
+                                    className="relative bg-white rounded-lg p-3 flex items-center gap-2 group border border-black/10"
                                 >
-                                    {isFile ? (
-                                        <FileImage className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                                    {isDataFile ? (
+                                        <FileImage className="w-5 h-5 text-black/40 flex-shrink-0" />
                                     ) : (
                                         <LinkIcon className="w-5 h-5 text-black flex-shrink-0" />
                                     )}
-                                    <span className="text-gray-700 text-sm truncate flex-1">
-                                        {isFile ? (item as File).name : (item as string)}
+                                    <span className="text-black text-sm truncate flex-1">
+                                        {isDataFile ? (item as any).name : (item as string)}
                                     </span>
                                     <button
                                         type="button"

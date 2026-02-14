@@ -1,23 +1,22 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
     useQuizStore,
     useCurrentQuestion,
-    useVisibleStepIndex,
-    useVisibleTotal,
     useIsAnswered,
-    useIsLastStep
+    useIsLastStep,
+    useVisibleStepIndex
 } from '@/store/quizStore';
-import ProgressBar from '../ProgressBar';
+
 import Slide from '../Slide';
 import TextInput from '../questions/TextInput';
 import RadioGroup from '../questions/RadioGroup';
 import CheckboxGroup from '../questions/CheckboxGroup';
 import FileUpload from '../questions/FileUpload';
 import FieldGroup from '../FieldGroup';
-import ResetButton from '../ResetButton';
-import { Send, RotateCcw } from 'lucide-react';
+
+import { Send } from 'lucide-react';
 
 const QuizScreen = () => {
     const {
@@ -28,16 +27,17 @@ const QuizScreen = () => {
         next,
         prev,
         submit,
-        updateAnswer,
-        openResetModal,
-        resetCurrentQuestion
+        updateAnswer
     } = useQuizStore();
 
     const currentQuestion = useCurrentQuestion();
-    const visibleStepIndex = useVisibleStepIndex();
-    const visibleTotal = useVisibleTotal();
     const isAnswered = useIsAnswered();
     const isLastStep = useIsLastStep();
+    const visibleStepIndex = useVisibleStepIndex();
+
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [currentStep]);
 
     if (!currentQuestion) return null;
 
@@ -95,7 +95,7 @@ const QuizScreen = () => {
             case 'file':
                 return (
                     <FileUpload
-                        value={currentAnswer as (File | string)[]}
+                        value={(currentAnswer as (string | { name: string, data: string })[]) || []}
                         onChange={(val) => updateAnswer(currentQuestion.id, val)}
                     />
                 );
@@ -106,34 +106,16 @@ const QuizScreen = () => {
 
     return (
         <div className="w-full">
-            <div className="max-w-2xl mx-auto flex justify-between items-end mb-2 px-1">
-                <div className="text-[10px] font-bold tracking-widest text-gray-400 uppercase">
-                    {Math.round(Math.min(Math.max((visibleStepIndex / (visibleTotal - 1)) * 100, 0), 100))}%
-                </div>
-                <div className="flex items-center gap-4">
-                    <div className="text-[10px] font-bold tracking-widest text-gray-400 uppercase opacity-80">
-                        {visibleStepIndex + 1} <span className="mx-0.5 text-gray-300">/</span> {visibleTotal}
-                    </div>
-                    <button
-                        onClick={openResetModal}
-                        className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer group"
-                        title="Начать заново"
-                    >
-                        <RotateCcw className="w-3.5 h-3.5 group-hover:rotate-180 transition-transform duration-500" />
-                    </button>
-                </div>
-            </div>
-            <ProgressBar current={visibleStepIndex} total={visibleTotal} />
             <Slide direction={direction} slideKey={currentQuestion.id}>
-                <div className="bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-                    <div className="flex justify-between items-start mb-6">
-                        <div>
-                            <h2 className="text-2xl font-semibold text-gray-900 mb-2">{currentQuestion.title}</h2>
-                            {currentQuestion.description && (
-                                <p className="text-gray-500">{currentQuestion.description}</p>
-                            )}
-                        </div>
-                        <ResetButton type="single" onReset={resetCurrentQuestion} />
+                <div className="py-4">
+                    <div className="text-center mb-10">
+                        <h2 className="text-3xl md:text-5xl font-light text-black mb-6 uppercase leading-[1]">
+                            <span className="block mb-2">БЛОК {visibleStepIndex + 1}.</span>
+                            {currentQuestion.title}
+                        </h2>
+                        {currentQuestion.description && (
+                            <p className="text-black/60 font-light text-sm">{currentQuestion.description}</p>
+                        )}
                     </div>
 
                     <div className="min-h-[200px]">
@@ -144,33 +126,35 @@ const QuizScreen = () => {
                         <button
                             onClick={prev}
                             disabled={currentStep === 0}
-                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${currentStep === 0
+                            className={`flex items-center gap-2 px-8 py-3 rounded-full font-light uppercase text-sm tracking-wide transition-all ${currentStep === 0
                                 ? "opacity-0 pointer-events-none"
-                                : "text-gray-600 hover:bg-gray-100"
+                                : "border border-black text-black hover:bg-black hover:text-white"
                                 }`}
                         >
                             НАЗАД
                         </button>
 
                         {isLastStep ? (
-                            <button
-                                onClick={submit}
-                                disabled={!isAnswered || isSubmitting}
-                                className={`flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-all ${isAnswered && !isSubmitting
-                                    ? "bg-green-600 text-white hover:bg-green-700"
-                                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                    }`}
-                            >
-                                {isSubmitting ? "Отправка..." : "Отправить бриф"}
-                                <Send className="w-5 h-5" />
-                            </button>
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={submit}
+                                    disabled={!isAnswered || isSubmitting}
+                                    className={`flex items-center gap-2 px-8 py-3 rounded-full font-light uppercase text-sm tracking-wide transition-all ${isAnswered && !isSubmitting
+                                        ? "bg-black text-white hover:bg-gray-900"
+                                        : "bg-black/5 text-black/20 cursor-not-allowed"
+                                        }`}
+                                >
+                                    {isSubmitting ? "Отправка..." : "Отправить бриф"}
+                                    <Send className="w-4 h-4" />
+                                </button>
+                            </div>
                         ) : (
                             <button
                                 onClick={next}
                                 disabled={!isAnswered}
-                                className={`flex items-center gap-2 px-8 py-3 rounded-xl font-semibold transition-all ${isAnswered
-                                    ? "bg-black text-white hover:bg-gray-100 hover:text-gray-600"
-                                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                className={`flex items-center gap-2 px-8 py-3 rounded-full font-light uppercase text-sm tracking-wide transition-all ${isAnswered
+                                    ? "bg-black text-white hover:bg-gray-900"
+                                    : "bg-black/5 text-black/20 cursor-not-allowed"
                                     }`}
                             >
                                 ДАЛЕЕ

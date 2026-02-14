@@ -30,9 +30,9 @@ const RadioItem: React.FC<RadioItemProps> = ({
         <div className="flex flex-col w-full h-full">
             <label
                 onClick={onSelect}
-                className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col items-center gap-3 h-full ${checked
-                    ? "bg-white border-black text-black"
-                    : "bg-white border-gray-200 text-gray-700 hover:border-black"
+                className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col items-center gap-3 h-full ${checked
+                    ? "bg-white border-black text-black shadow-lg shadow-black/5"
+                    : "bg-white border-black/10 text-black hover:border-black/30"
                     } ${className}`}
             >
                 <input
@@ -44,7 +44,7 @@ const RadioItem: React.FC<RadioItemProps> = ({
                 />
 
                 {image && (
-                    <div className="w-full aspect-video relative rounded-lg overflow-hidden bg-gray-100">
+                    <div className="w-full aspect-video relative rounded-lg overflow-hidden bg-black/5">
                         <Image
                             src={image}
                             alt={label}
@@ -57,21 +57,21 @@ const RadioItem: React.FC<RadioItemProps> = ({
                 <div className="flex items-center gap-3 w-full">
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${checked
                         ? "border-black"
-                        : "border-gray-300"
+                        : "border-black/20"
                         }`}>
                         {checked && <div className="w-2.5 h-2.5 rounded-full bg-black" />}
                     </div>
 
                     <div className="flex flex-col flex-1 pl-1 text-left">
                         {isEditable ? (
-                            <span className="text-sm font-medium">
+                            <span className="text-sm font-light">
                                 {checked ? "Свой вариант" : "Добавить свой вариант"}
                             </span>
                         ) : (
                             <>
-                                <span className="text-sm font-medium">{label}</span>
+                                <span className="text-sm font-light">{label}</span>
                                 {description && (
-                                    <span className={`text-xs mt-0.5 transition-colors ${checked ? "text-gray-600" : "text-gray-400"}`}>
+                                    <span className={`text-xs mt-0.5 transition-colors ${checked ? "text-black/70" : "text-black/40"}`}>
                                         {description}
                                     </span>
                                 )}
@@ -88,7 +88,7 @@ const RadioItem: React.FC<RadioItemProps> = ({
                         value={label === "Свой вариант" ? "" : label}
                         onChange={(e) => onLabelChange?.(e.target.value)}
                         placeholder="Введите ваш вариант..."
-                        className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all"
+                        className="w-full bg-white border border-black/10 rounded-2xl px-4 py-3 text-black text-sm font-light focus:outline-none focus:border-black/40 transition-all"
                         autoFocus
                     />
                 </div>

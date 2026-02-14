@@ -24,7 +24,7 @@ interface QuizState {
     startQuiz: () => void;
     next: () => void;
     prev: () => void;
-    updateAnswer: (questionId: string, value: string | string[] | (File | string)[]) => void;
+    updateAnswer: (questionId: string, value: string | string[] | (string | { name: string, data: string })[]) => void;
     openResetModal: () => void;
     closeResetModal: () => void;
     confirmReset: () => void;
@@ -93,10 +93,11 @@ export const useQuizStore = create<QuizState>((set, get) => ({
         const newAnswers = { ...answers, [questionId]: value };
         set({ answers: newAnswers });
 
-        // Don't save File objects to localStorage
+        // Don't save large Base64 files to localStorage
         const storableAnswers = { ...newAnswers };
         Object.keys(storableAnswers).forEach(key => {
-            if (Array.isArray(storableAnswers[key]) && storableAnswers[key][0] instanceof File) {
+            const val = storableAnswers[key];
+            if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'object' && 'data' in val[0]) {
                 delete storableAnswers[key];
             }
         });
@@ -148,11 +149,21 @@ export const useQuizStore = create<QuizState>((set, get) => ({
             Object.keys(answers).forEach(key => {
                 const value = answers[key];
                 if (Array.isArray(value)) {
-                    const files = value.filter(item => item instanceof File);
-                    const nonFiles = value.filter(item => !(item instanceof File));
+                    // Filter base64 data objects
+                    const dataFiles = value.filter(item => typeof item === 'object' && item !== null && 'data' in item) as { name: string, data: string }[];
+                    const nonFiles = value.filter(item => typeof item === 'string');
 
-                    files.forEach(file => {
-                        formData.append(`file_${key}`, file as File);
+                    dataFiles.forEach((file) => {
+                        // Convert base64 back to Blob for FormData
+                        const [header, base64Data] = file.data.split(',');
+                        const mime = header.match(/:(.*?);/)?.[1] || 'image/png';
+                        const binary = atob(base64Data);
+                        const array = new Uint8Array(binary.length);
+                        for (let i = 0; i < binary.length; i++) {
+                            array[i] = binary.charCodeAt(i);
+                        }
+                        const blob = new Blob([array], { type: mime });
+                        formData.append(`file_${key}`, blob, file.name);
                     });
 
                     cleanAnswers[key] = nonFiles;

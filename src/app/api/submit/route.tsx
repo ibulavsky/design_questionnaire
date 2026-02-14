@@ -28,6 +28,11 @@ export async function POST(request: Request) {
 
                 // Track files in answers for PDF
                 if (!answers[questionId]) answers[questionId] = [];
+                if (!Array.isArray(answers[questionId])) {
+                    // If it was already set by a JSON string (unlikely given order, but safe)
+                    answers[questionId] = [answers[questionId]];
+                }
+
                 answers[questionId].push({
                     data: `data:${file.type};base64,${buffer.toString('base64')}`,
                     name: file.name,
@@ -35,7 +40,13 @@ export async function POST(request: Request) {
                 });
             } else {
                 try {
-                    answers[key] = JSON.parse(value as string);
+                    const parsed = JSON.parse(value as string);
+                    if (Array.isArray(parsed) && Array.isArray(answers[key])) {
+                        // Merge links with files
+                        answers[key] = [...answers[key], ...parsed];
+                    } else {
+                        answers[key] = parsed;
+                    }
                 } catch {
                     answers[key] = value;
                 }

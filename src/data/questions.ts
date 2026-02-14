@@ -287,7 +287,7 @@ export const QUESTIONS: Question[] = [
                     { label: 'Шрифтовой', id: 'text', image: '/images/logo-types/text.png' },
                     { label: 'Комбинированный', id: 'combined', image: '/images/logo-types/combined.png' },
                     { label: 'Эмблема', id: 'emblem', image: '/images/logo-types/emblem.png' },
-                    { label: 'Интегрированный', id: 'integrated', image: '/images/logo-types/symbol.png' },
+                    { label: 'Интегрированный', id: 'integrated', image: '/images/logo-types/symbol.jpg' },
                     { label: 'Монограмма', id: 'monogram', image: '/images/logo-types/monogram.png' },
                 ],
             },
@@ -341,7 +341,7 @@ export const QUESTIONS: Question[] = [
 
     // СЛАЙД 9: Использование фирменного стиля
     {
-        id: 'deliverables',
+        id: 'style_usage',
         type: 'checkbox',
         title: 'Где логотип и фирменный стиль будет использоваться?',
         description: 'Выберите необходимые носители фирменного стиля из списка',

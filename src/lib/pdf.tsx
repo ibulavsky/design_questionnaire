@@ -86,6 +86,32 @@ export const QuestionnairePDF: React.FC<PDFTemplateProps> = ({ answers }) => (
             </View>
 
             {QUESTIONS.map((q) => {
+                const getLabel = (field: any, val: any) => {
+                    if (typeof val !== 'string') return val;
+                    const option = (field.options || []).find((opt: any) => {
+                        const optId = typeof opt === 'string' ? opt : (opt.id || opt.label);
+                        return optId === val;
+                    });
+                    return typeof option === 'string' ? option : (option?.label || val);
+                };
+
+                const getAbsoluteUrl = (url: string) => {
+                    if (!url) return '';
+                    if (url.startsWith('http') || url.startsWith('data:')) return url;
+
+                    // Client side: use window.location.origin
+                    if (typeof window !== 'undefined') {
+                        return `${window.location.origin}${url}`;
+                    }
+
+                    // Server side: resolve path to public folder
+                    if (url.startsWith('/')) {
+                        return path.join(process.cwd(), 'public', url);
+                    }
+
+                    return url;
+                };
+
                 const renderField = (field: any, val: any) => {
                     if (!val) return null;
 
@@ -103,7 +129,52 @@ export const QuestionnairePDF: React.FC<PDFTemplateProps> = ({ answers }) => (
                                             <View key={idx} style={{ width: '30%', marginBottom: 10 }}>
                                                 <PDFImage src={imgSrc} style={{ width: '100%' }} />
                                                 <Text style={{ fontSize: 8, color: '#666', marginTop: 2 }}>
-                                                    {item.name || `Изображение ${idx + 1}`}
+                                                    {typeof item === 'object' ? (item.name || `Файл ${idx + 1}`) : `Ссылка ${idx + 1}`}
+                                                </Text>
+                                                {typeof item === 'string' && (
+                                                    <Text style={{ fontSize: 7, color: '#2563eb', marginTop: 1 }}>
+                                                        {item.length > 30 ? item.substring(0, 27) + '...' : item}
+                                                    </Text>
+                                                )}
+                                            </View>
+                                        );
+                                    })}
+                                </View>
+                            </View>
+                        );
+                    }
+
+                    // Handle options with images (radio/checkbox)
+                    const selectedOptionsWithImages = (field.options || [])
+                        .filter((opt: any) => {
+                            const optId = typeof opt === 'string' ? opt : (opt.id || opt.label);
+                            const isSelected = Array.isArray(val) ? val.includes(optId) : val === optId;
+                            return isSelected && typeof opt === 'object' && opt.image;
+                        });
+
+                    if (selectedOptionsWithImages.length > 0) {
+                        return (
+                            <View key={field.id} style={styles.section} wrap={false}>
+                                <Text style={styles.question}>{field.title}</Text>
+                                <Text style={[styles.answer, { marginBottom: 10 }]}>
+                                    {Array.isArray(val)
+                                        ? val.map(v => getLabel(field, v)).join(', ')
+                                        : getLabel(field, val)}
+                                </Text>
+                                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                                    {selectedOptionsWithImages.map((opt: any, idx: number) => {
+                                        const isSvg = opt.image.toLowerCase().endsWith('.svg');
+                                        return (
+                                            <View key={idx} style={{ width: '30%', marginBottom: 10 }}>
+                                                {!isSvg ? (
+                                                    <PDFImage src={getAbsoluteUrl(opt.image)} style={{ width: '100%' }} />
+                                                ) : (
+                                                    <View style={{ width: '100%', aspectRatio: 1, backgroundColor: '#f3f4f6', justifyContent: 'center', alignItems: 'center' }}>
+                                                        <Text style={{ fontSize: 8, color: '#9ca3af' }}>SVG Preview N/A</Text>
+                                                    </View>
+                                                )}
+                                                <Text style={{ fontSize: 8, color: '#666', marginTop: 2 }}>
+                                                    {opt.label}
                                                 </Text>
                                             </View>
                                         );
@@ -118,7 +189,9 @@ export const QuestionnairePDF: React.FC<PDFTemplateProps> = ({ answers }) => (
                         <View key={field.id} style={styles.section} wrap={false}>
                             <Text style={styles.question}>{field.title}</Text>
                             <Text style={styles.answer}>
-                                {Array.isArray(val) ? val.join(', ') : val}
+                                {Array.isArray(val)
+                                    ? val.map(v => getLabel(field, v)).join(', ')
+                                    : getLabel(field, val)}
                             </Text>
                         </View>
                     );
