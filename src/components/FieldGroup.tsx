@@ -1,11 +1,10 @@
-'use client';
-
 import React from 'react';
 import TextInput from './questions/TextInput';
 import CheckboxGroup from './questions/CheckboxGroup';
 import RadioGroup from './questions/RadioGroup';
 import FileUpload from './questions/FileUpload';
 import { Question, Answers } from '../lib/types';
+import { fixTypography } from '../lib/typography';
 
 interface FieldGroupProps {
     fields: Question[];
@@ -23,12 +22,12 @@ const FieldGroup: React.FC<FieldGroupProps> = ({ fields, answers, onUpdate }) =>
 
                 return (
                     <div key={field.id}>
-                        <label className="block text-xs font-light uppercase tracking-widest text-black mb-3">
-                            {field.title}
+                        <label className="block text-xs font-light uppercase text-black mb-2">
+                            {fixTypography(field.title)}
                             {field.required && <span className="text-red-500 ml-1">*</span>}
                         </label>
                         {field.description && (
-                            <p className="text-black/60 text-sm font-light mb-3">{field.description}</p>
+                            <p className="text-black/60 text-sm font-light mb-4 leading-relaxed">{fixTypography(field.description)}</p>
                         )}
 
                         {(field.type === 'text' || field.type === 'textarea') && (

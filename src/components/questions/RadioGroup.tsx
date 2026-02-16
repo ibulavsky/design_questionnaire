@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { QuestionOption } from '../../lib/types';
 import RadioItem from './RadioItem';
+import { t } from '@/lib/i18n';
 
 interface RadioGroupProps {
     options: (string | QuestionOption)[];
@@ -47,7 +48,7 @@ const RadioGroup: React.FC<RadioGroupProps> = ({ options, value, onChange, name 
 
     return (
         <div className="flex flex-col gap-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4" role="radiogroup">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" role="radiogroup">
                 {options.map((opt) => {
                     const option = normalizeOption(opt);
                     const optId = option.id || option.label;
@@ -67,7 +68,7 @@ const RadioGroup: React.FC<RadioGroupProps> = ({ options, value, onChange, name 
                 })}
                 {allowOther && (
                     <RadioItem
-                        label={isCustomValue(value) ? value : "Свой вариант"}
+                        label={isCustomValue(value) ? value : t('common.other', { raw: true })}
                         checked={isOtherActive}
                         isEditable={true}
                         onSelect={handleOtherSelect}

@@ -4,7 +4,7 @@ import React from 'react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { QuestionnairePDF } from '../lib/pdf';
 import { Answers } from '../lib/types';
-import { Download, FileText } from 'lucide-react';
+import { FileText } from 'lucide-react';
 
 interface DownloadPDFProps {
     answers: Answers;
@@ -32,7 +32,6 @@ const DownloadPDF: React.FC<DownloadPDFProps> = ({ answers, children }) => {
                                 <>
                                     <FileText className="w-4 h-4" />
                                     <span>Скачать бриф в PDF</span>
-                                    <Download className="w-4 h-4 ml-1" />
                                 </>
                             )}
                         </button>

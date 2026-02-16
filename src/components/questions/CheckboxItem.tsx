@@ -2,6 +2,8 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { t } from '@/lib/i18n';
+import { fixTypography } from '@/lib/typography';
 import { Check } from 'lucide-react';
 
 interface CheckboxItemProps {
@@ -43,7 +45,7 @@ const CheckboxItem: React.FC<CheckboxItemProps> = ({
                 />
 
                 {image && (
-                    <div className="w-full aspect-video relative rounded-lg overflow-hidden bg-black/5 mb-2">
+                    <div className="w-full aspect-video relative rounded-lg overflow-hidden bg-white mb-2">
                         <Image
                             src={image}
                             alt={label}
@@ -66,16 +68,16 @@ const CheckboxItem: React.FC<CheckboxItemProps> = ({
 
                     <div className="flex flex-col flex-1 pl-1 text-left">
                         {!isEditable ? (
-                            <span className="font-light text-sm md:text-base">{label}</span>
+                            <span className="font-light text-sm md:text-base">{fixTypography(label)}</span>
                         ) : (
                             <span className="font-light text-sm md:text-base">
-                                {checked ? "Свой вариант" : "Добавить свой вариант"}
+                                {checked ? t('common.other') : t('common.addOther')}
                             </span>
                         )}
 
                         {description && !isEditable && (
                             <span className={`text-xs mt-1 transition-colors ${checked || partiallySelected ? "text-black/70" : "text-black/40"}`}>
-                                {description}
+                                {fixTypography(description)}
                             </span>
                         )}
                     </div>
@@ -86,10 +88,10 @@ const CheckboxItem: React.FC<CheckboxItemProps> = ({
                 <div className="mt-2 pl-4">
                     <input
                         type="text"
-                        value={label === "Свой вариант" ? "" : label}
+                        value={label === t('common.other', { raw: true }) ? "" : label}
                         onChange={(e) => onLabelChange?.(e.target.value)}
-                        placeholder="Введите ваш вариант..."
-                        className="w-full bg-white border border-black/10 rounded-2xl px-4 py-2 text-black text-sm font-light focus:outline-none focus:border-black/40 transition-all"
+                        placeholder={t('common.enterOther')}
+                        className="w-full bg-white border border-black/10 rounded-2xl px-4 py-2 text-black text-base font-light text-xs placeholder:tracking-normal placeholder:placeholder-black/30 focus:outline-none focus:border-black/40 transition-all"
                         autoFocus
                     />
                 </div>

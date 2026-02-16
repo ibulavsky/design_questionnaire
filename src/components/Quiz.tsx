@@ -7,6 +7,8 @@ import ResetButton from './ResetButton';
 import WelcomeScreen from './screens/WelcomeScreen';
 import ThankYouScreen from './screens/ThankYouScreen';
 import QuizScreen from './screens/QuizScreen';
+import { t } from '@/lib/i18n';
+import { fixTypography } from '@/lib/typography';
 
 const Quiz = () => {
     const {
@@ -44,7 +46,7 @@ const Quiz = () => {
     if (!currentQuestion) {
         return (
             <div className="text-center py-20">
-                <p className="text-gray-900 mb-4 font-medium">Произошла ошибка загрузки вопроса.</p>
+                <p className="text-gray-900 mb-4 font-medium">{t('common.errorLoading')}</p>
                 <ResetButton type="full" onReset={openResetModal} />
             </div>
         );
@@ -57,9 +59,9 @@ const Quiz = () => {
                 isOpen={isResetModalOpen}
                 onClose={closeResetModal}
                 onConfirm={confirmReset}
-                title="Сброс ответов"
-                description="Вы уверены, что хотите сбросить все заполненные данные? Это действие нельзя будет отменить."
-                confirmLabel="Сбросить всё"
+                title={t('resetModal.title')}
+                description={fixTypography(t('resetModal.description'))}
+                confirmLabel={t('resetModal.confirm')}
                 confirmVariant="danger"
             />
         </>

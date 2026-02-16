@@ -4,6 +4,7 @@ import React from 'react';
 import { Instagram, Send } from 'lucide-react';
 import { useQuizStore, useVisibleStepIndex, useVisibleTotal } from '@/store/quizStore';
 import ProgressBar from './ProgressBar';
+import { t } from '@/lib/i18n';
 
 const MainFooter = () => {
 
@@ -47,7 +48,7 @@ const MainFooter = () => {
                                 className="text-black/50 font-light hover:text-black transition-colors"
                                 title="Reset"
                             >
-                                ОЧИСТИТЬ ВСЁ
+                                {t('common.reset')}
                             </button>
                         </div>
                     }
@@ -80,7 +81,7 @@ const MainFooter = () => {
                                 className="text-black/50 font-light hover:text-black transition-colors"
                                 title="Reset"
                             >
-                                НАЧАТЬ ЗАНОВО
+                                {t('common.resetAll')}
                             </button>
                         </div>
                     )}

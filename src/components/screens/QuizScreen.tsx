@@ -17,6 +17,8 @@ import FileUpload from '../questions/FileUpload';
 import FieldGroup from '../FieldGroup';
 
 import { Send } from 'lucide-react';
+import { fixTypography } from '@/lib/typography';
+import { t } from '@/lib/i18n';
 
 const QuizScreen = () => {
     const {
@@ -110,11 +112,11 @@ const QuizScreen = () => {
                 <div className="py-4">
                     <div className="text-center mb-10">
                         <h2 className="text-3xl md:text-5xl font-light text-black mb-6 uppercase leading-[1]">
-                            <span className="block mb-2">БЛОК {visibleStepIndex + 1}.</span>
-                            {currentQuestion.title}
+                            <span className="block mb-1">БЛОК {visibleStepIndex + 1}.</span>
+                            {fixTypography(currentQuestion.title)}
                         </h2>
                         {currentQuestion.description && (
-                            <p className="text-black/60 font-light text-sm">{currentQuestion.description}</p>
+                            <p className="text-black/60 font-light text-sm">{fixTypography(currentQuestion.description)}</p>
                         )}
                     </div>
 
@@ -131,7 +133,7 @@ const QuizScreen = () => {
                                 : "border border-black text-black hover:bg-black hover:text-white"
                                 }`}
                         >
-                            НАЗАД
+                            {t('common.back')}
                         </button>
 
                         {isLastStep ? (
@@ -144,7 +146,7 @@ const QuizScreen = () => {
                                         : "bg-black/5 text-black/20 cursor-not-allowed"
                                         }`}
                                 >
-                                    {isSubmitting ? "Отправка..." : "Отправить бриф"}
+                                    {isSubmitting ? t('common.sending') : t('common.send')}
                                     <Send className="w-4 h-4" />
                                 </button>
                             </div>
@@ -157,7 +159,7 @@ const QuizScreen = () => {
                                     : "bg-black/5 text-black/20 cursor-not-allowed"
                                     }`}
                             >
-                                ДАЛЕЕ
+                                {t('common.next')}
                             </button>
                         )}
                     </div>

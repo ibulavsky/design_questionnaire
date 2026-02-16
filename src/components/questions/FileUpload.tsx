@@ -2,6 +2,8 @@
 
 import React, { useRef, useState } from 'react';
 import { Upload, X, FileImage, Link as LinkIcon } from 'lucide-react';
+import { t } from '@/lib/i18n';
+import { fixTypography } from '@/lib/typography';
 
 interface FileUploadProps {
     value: (string | { name: string, data: string })[];
@@ -66,23 +68,23 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
     return (
         <div className="space-y-4">
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
                 <input
                     type="text"
                     value={link}
                     onChange={(e) => setLink(e.target.value)}
-                    placeholder="Вставьте ссылку на изображение..."
-                    className="flex-1 bg-white border border-black/10 rounded-2xl px-4 py-2 text-black text-sm font-light focus:outline-none focus:border-gray-400 transition-all"
+                    placeholder={t('common.linkPlaceholder')}
+                    className="flex-1 bg-white border border-black/10 rounded-2xl px-4 py-3 text-black text-base font-light text-xs placeholder:tracking-normal placeholder:placeholder-black/30 focus:outline-none focus:border-gray-400 transition-all"
                 />
                 <button
                     type="button"
                     onClick={addLink}
-                    className="px-4 py-2 bg-black hover:bg-gray-900 text-white rounded-full text-sm font-light transition-colors whitespace-nowrap"
+                    className="px-6 py-3 bg-black hover:bg-gray-900 text-white rounded-2xl text-sm font-light transition-colors whitespace-nowrap"
                 >
-                    Добавить ссылку
+                    {t('common.addLink')}
                 </button>
             </div>
-            <p className="text-black/60">Либо загрузите файлы</p>
+            <p className="text-black/60">{fixTypography(t('common.uploadOr')) || 'Либо загрузите файлы'}</p>
             <div
                 onClick={() => inputRef.current?.click()}
                 onDrop={handleDrop}
@@ -103,10 +105,10 @@ const FileUpload: React.FC<FileUploadProps> = ({
                 />
                 <Upload className="w-10 h-10 mx-auto mb-3 text-black/40" />
                 <p className="text-black/60 text-sm">
-                    Перетащите файлы сюда или <span className="text-black font-normal">нажмите для выбора</span>
+                    {fixTypography(t('common.uploadTip'))}
                 </p>
                 <p className="text-black/40 text-xs mt-2">
-                    Максимум {maxFiles} элементов (файлов или ссылок)
+                    {fixTypography(t('common.maxItems', { replacements: { count: maxFiles.toString() } }))}
                 </p>
             </div>
 

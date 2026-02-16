@@ -6,7 +6,6 @@ export const QUESTIONS: Question[] = [
         id: 'company_info',
         type: 'group',
         title: 'Информация о компании',
-        description: 'Расскажите о вашей компании',
         fields: [
             {
                 id: 'company_name',
@@ -23,7 +22,7 @@ export const QUESTIONS: Question[] = [
                 id: 'products_services',
                 type: 'textarea',
                 title: 'Чем занимается ваша компания? Основные продукты и оказываемые услуги',
-                description: 'Опишите ваш продукт или услугу простыми словами',
+                placeholder: 'Опишите ваш продукт или услугу простыми словами',
                 required: true,
             },
 
@@ -35,13 +34,11 @@ export const QUESTIONS: Question[] = [
         id: 'company_info2',
         type: 'group',
         title: 'Дополнительная информация о компании',
-        description: 'Расскажите о вашей компании',
         fields: [
             {
                 id: 'company_age',
                 type: 'text',
                 title: 'Как давно существует ваша компания?',
-                description: '',
             },
             {
                 id: 'company_geography',
@@ -214,13 +211,13 @@ export const QUESTIONS: Question[] = [
                 id: 'visual_avoid',
                 type: 'textarea',
                 title: 'Какие негативные визуальные образы стоит избегать?',
-                description: 'Например: нельзя использовать образы животных по религиозным причинам',
+                placeholder: 'Например: нельзя использовать образы животных по религиозным причинам',
             },
             {
                 id: 'visual_use',
                 type: 'textarea',
                 title: 'Какие положительные визуальные образы стоит использовать?',
-                description: 'Укажите причину (Например: собака вызывает прямую ассоциацию с дружбой)',
+                placeholder: 'Укажите причину (Например: собака вызывает прямую ассоциацию с дружбой)',
             },
             {
                 id: 'limitations',
@@ -240,7 +237,7 @@ export const QUESTIONS: Question[] = [
                 id: 'competitors_list',
                 type: 'textarea',
                 title: 'Назовите 3 и более основных ваших конкурентов',
-                description: 'Можно ссылками на сайты/соцсети',
+                placeholder: 'Можно ссылками на сайты/соцсети',
             },
             {
                 id: 'liked_companies',
@@ -256,7 +253,7 @@ export const QUESTIONS: Question[] = [
                 id: 'differentiation',
                 type: 'textarea',
                 title: 'Чем вы принципиально отличаетесь от конкурентов?',
-                description: 'Почему потребители выбирают вас, почему им бы стоило выбирать вас',
+                placeholder: 'Почему потребители выбирают вас, почему им бы стоило выбирать вас',
             },
         ],
     },
@@ -295,7 +292,7 @@ export const QUESTIONS: Question[] = [
                 id: 'color_preferences',
                 type: 'textarea',
                 title: 'Есть ли предпочтения по цветам/стилю / приемам? Почему?',
-                description: 'Прикрепите примеры ниже в разделе файлов',
+                placeholder: 'Прикрепите примеры ниже в разделе файлов',
             },
             {
                 id: 'forbidden_elements',
@@ -470,7 +467,6 @@ export const QUESTIONS: Question[] = [
         id: 'contact_info_slide',
         type: 'group',
         title: 'Контактная информация',
-        description: 'Оставьте свои контактные данные для связи',
         fields: [
             {
                 id: 'name',

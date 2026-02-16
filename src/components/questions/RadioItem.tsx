@@ -2,6 +2,8 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { t } from '@/lib/i18n';
+import { fixTypography } from '@/lib/typography';
 
 interface RadioItemProps {
     label: string;
@@ -44,7 +46,7 @@ const RadioItem: React.FC<RadioItemProps> = ({
                 />
 
                 {image && (
-                    <div className="w-full aspect-video relative rounded-lg overflow-hidden bg-black/5">
+                    <div className="w-full aspect-video relative rounded-lg overflow-hidden bg-white">
                         <Image
                             src={image}
                             alt={label}
@@ -65,14 +67,14 @@ const RadioItem: React.FC<RadioItemProps> = ({
                     <div className="flex flex-col flex-1 pl-1 text-left">
                         {isEditable ? (
                             <span className="text-sm font-light">
-                                {checked ? "Свой вариант" : "Добавить свой вариант"}
+                                {checked ? t('common.other') : t('common.addOther')}
                             </span>
                         ) : (
                             <>
-                                <span className="text-sm font-light">{label}</span>
+                                <span className="text-sm font-light">{fixTypography(label)}</span>
                                 {description && (
                                     <span className={`text-xs mt-0.5 transition-colors ${checked ? "text-black/70" : "text-black/40"}`}>
-                                        {description}
+                                        {fixTypography(description)}
                                     </span>
                                 )}
                             </>
@@ -85,10 +87,10 @@ const RadioItem: React.FC<RadioItemProps> = ({
                 <div className="mt-2 px-1">
                     <input
                         type="text"
-                        value={label === "Свой вариант" ? "" : label}
+                        value={label === t('common.other', { raw: true }) ? "" : label}
                         onChange={(e) => onLabelChange?.(e.target.value)}
-                        placeholder="Введите ваш вариант..."
-                        className="w-full bg-white border border-black/10 rounded-2xl px-4 py-3 text-black text-sm font-light focus:outline-none focus:border-black/40 transition-all"
+                        placeholder={t('common.enterOther')}
+                        className="w-full bg-white border border-black/10 rounded-2xl px-4 py-3 text-black text-base font-light text-xs placeholder:tracking-normal placeholder:placeholder-black/30 focus:outline-none focus:border-black/40 transition-all"
                         autoFocus
                     />
                 </div>

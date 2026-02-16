@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { QuestionOption } from '../../lib/types';
 import CheckboxItem from './CheckboxItem';
+import { t } from '@/lib/i18n';
 
 interface CheckboxGroupProps {
     options: (string | QuestionOption)[];
@@ -110,7 +111,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ options, value = [], onCh
 
     return (
         <div className="flex flex-col gap-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
                 {options.map((opt) => {
                     const option = normalizeOption(opt);
                     return <RecursiveOption key={option.id || option.label} option={option} />;
@@ -120,7 +121,7 @@ const CheckboxGroup: React.FC<CheckboxGroupProps> = ({ options, value = [], onCh
             {allowOther && (
                 <div className="mt-2">
                     <CheckboxItem
-                        label={customValue || "Свой вариант"}
+                        label={customValue || t('common.other', { raw: true })}
                         checked={isOtherActive}
                         isEditable={true}
                         onChange={handleCustomToggle}
