@@ -74,7 +74,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
                     value={link}
                     onChange={(e) => setLink(e.target.value)}
                     placeholder={t('common.linkPlaceholder')}
-                    className="flex-1 bg-white border border-black/10 rounded-2xl px-4 py-3 text-black text-base font-light text-xs placeholder:tracking-normal placeholder:placeholder-black/30 focus:outline-none focus:border-gray-400 transition-all"
+                    className="flex-1 bg-white border border-black/10 rounded-2xl px-4 py-3 text-black text-base font-light placeholder:text-xs placeholder:tracking-normal placeholder:placeholder-black/30 focus:outline-none focus:border-gray-400 transition-all"
                 />
                 <button
                     type="button"

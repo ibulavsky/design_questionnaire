@@ -91,7 +91,7 @@ const CheckboxItem: React.FC<CheckboxItemProps> = ({
                         value={label === t('common.other', { raw: true }) ? "" : label}
                         onChange={(e) => onLabelChange?.(e.target.value)}
                         placeholder={t('common.enterOther')}
-                        className="w-full bg-white border border-black/10 rounded-2xl px-4 py-2 text-black text-base font-light text-xs placeholder:tracking-normal placeholder:placeholder-black/30 focus:outline-none focus:border-black/40 transition-all"
+                        className="w-full bg-white border border-black/10 rounded-2xl px-4 py-2 text-black text-base font-light placeholder:text-xs placeholder:tracking-normal placeholder:placeholder-black/30 focus:outline-none focus:border-black/40 transition-all"
                         autoFocus
                     />
                 </div>
